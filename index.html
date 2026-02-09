@@ -203,6 +203,35 @@
       color: white;
     }
 
+    /* Prose styles for rich content */
+    .prose {
+      color: #374151;
+      line-height: 1.75;
+    }
+
+    .prose h4 {
+      font-weight: 700;
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .prose p {
+      margin-bottom: 1rem;
+    }
+
+    .prose ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .prose code {
+      background: #f3f4f6;
+      padding: 0.125rem 0.25rem;
+      border-radius: 0.25rem;
+      font-size: 0.875em;
+      font-family: 'Courier New', monospace;
+    }
+
     /* Mobile Responsive Styles */
     @media (max-width: 768px) {
       h1 {
@@ -686,7 +715,7 @@
           <div class="glass-card text-left space-y-3 sm:space-y-4">
             <div class="flex items-center gap-3 text-gray-300 text-sm sm:text-base">
               <span class="text-xl sm:text-2xl">📧</span>
-              <span class="break-all">kontakt@imperium.pl</span>
+              <span class="break-all"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c7aca8a9b3a6acb387aeaab7a2b5aeb2aae9b7ab">[email&#160;protected]</a></span>
             </div>
             <div class="flex items-center gap-3 text-gray-300 text-sm sm:text-base">
               <span class="text-xl sm:text-2xl">💼</span>
@@ -713,7 +742,7 @@
           </div>
           
           <div class="flex items-center gap-3 sm:gap-6">
-            <span class="hidden sm:inline text-gray-600 text-sm sm:text-base" id="userEmail">user@example.com</span>
+            <span class="hidden sm:inline text-gray-600 text-sm sm:text-base" id="userEmail"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2f5a5c4a5d6f4a574e425f434a014c4042">[email&#160;protected]</a></span>
             <button onclick="logout()" class="text-gray-600 hover:text-pink-600 font-medium text-sm sm:text-base">
               Wyloguj
             </button>
@@ -761,6 +790,9 @@
           <button class="tab-button active whitespace-nowrap" onclick="switchTab('courses')" id="tab-courses">
             Moje kursy
           </button>
+          <button class="tab-button whitespace-nowrap" onclick="switchTab('lessons')" id="tab-lessons">
+            📚 Lekcje
+          </button>
           <button class="tab-button whitespace-nowrap" onclick="switchTab('tools')" id="tab-tools">
             Narzędzia
           </button>
@@ -793,7 +825,7 @@
             
             <div class="flex justify-between items-center text-sm text-gray-500">
               <span>12/18 lekcji</span>
-              <button class="text-pink-600 font-semibold hover:text-pink-700">Kontynuuj →</button>
+              <button onclick="switchTab('lessons')" class="text-pink-600 font-semibold hover:text-pink-700">Kontynuuj →</button>
             </div>
           </div>
 
@@ -817,7 +849,7 @@
             
             <div class="flex justify-between items-center text-sm text-gray-500">
               <span>5/15 lekcji</span>
-              <button class="text-pink-600 font-semibold hover:text-pink-700">Kontynuuj →</button>
+              <button onclick="switchTab('lessons')" class="text-pink-600 font-semibold hover:text-pink-700">Kontynuuj →</button>
             </div>
           </div>
 
@@ -857,6 +889,228 @@
               <span>Premiera: 15.03.2026</span>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- Lessons Tab (NEW) -->
+      <div id="content-lessons" class="tab-content hidden">
+        <div class="max-w-5xl mx-auto space-y-8">
+          
+          <!-- Lesson Navigation -->
+          <div class="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-200">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-2xl font-bold text-gray-900">Landing Page Mastery</h2>
+              <span class="badge">Lekcja 12/18</span>
+            </div>
+            <div class="flex gap-2 overflow-x-auto pb-2">
+              <button class="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm whitespace-nowrap">← Poprzednia</button>
+              <button class="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-lg text-sm font-semibold whitespace-nowrap">Następna →</button>
+            </div>
+          </div>
+
+          <!-- Video Section -->
+          <div class="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-200">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 flex items-center justify-center text-white font-bold">
+                📹
+              </div>
+              <div>
+                <h3 class="text-xl font-bold text-gray-900">Lekcja 12: Jak napisać hero section który konwertuje</h3>
+                <p class="text-sm text-gray-500">Czas trwania: 18 min</p>
+              </div>
+            </div>
+
+            <!-- Video Player -->
+            <div class="relative bg-black rounded-lg overflow-hidden" style="padding-bottom: 56.25%; height: 0;">
+              <!-- YouTube embed example -->
+              <iframe 
+                class="absolute top-0 left-0 w-full h-full"
+                src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
+                title="YouTube video player" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen>
+              </iframe>
+              
+              <!-- Alternative: Vimeo embed
+              <iframe 
+                class="absolute top-0 left-0 w-full h-full"
+                src="https://player.vimeo.com/video/TWOJE_VIDEO_ID?h=XXX" 
+                frameborder="0" 
+                allow="autoplay; fullscreen; picture-in-picture" 
+                allowfullscreen>
+              </iframe>
+              -->
+            </div>
+
+            <!-- Video description -->
+            <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+              <h4 class="font-semibold text-gray-900 mb-2">Co się nauczysz:</h4>
+              <ul class="text-sm text-gray-600 space-y-1">
+                <li>✓ Framework 3-sekundowego hooka</li>
+                <li>✓ Jak pisać wartość bez buzzwordów</li>
+                <li>✓ A/B testing hero sections</li>
+                <li>✓ 5 przykładów z real case studies</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- PDF/Ebook Section -->
+          <div class="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-200">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 flex items-center justify-center text-white font-bold">
+                📄
+              </div>
+              <div>
+                <h3 class="text-xl font-bold text-gray-900">Materiał do lekcji: Hero Section Cheatsheet</h3>
+                <p class="text-sm text-gray-500">PDF • 2.3 MB • 15 stron</p>
+              </div>
+            </div>
+
+            <!-- PDF Viewer (inline) -->
+            <div class="border-2 border-gray-200 rounded-lg overflow-hidden bg-gray-100" style="height: 600px;">
+              <!-- Google Docs Viewer embed -->
+              <iframe 
+                src="https://docs.google.com/viewer?url=https://www.adobe.com/support/products/enterprise/knowledgecenter/media/c4611_sample_explain.pdf&embedded=true" 
+                class="w-full h-full"
+                frameborder="0">
+              </iframe>
+              
+              <!-- Alternative: Direct PDF embed (if hosted on your domain)
+              <embed 
+                src="URL_DO_TWOJEGO_PDF.pdf" 
+                type="application/pdf" 
+                class="w-full h-full">
+              -->
+            </div>
+
+            <!-- Download button -->
+            <div class="mt-4 flex gap-3">
+              <button class="flex-1 bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition">
+                📥 Pobierz PDF
+              </button>
+              <button class="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:border-pink-500 transition">
+                🖨️ Drukuj
+              </button>
+            </div>
+          </div>
+
+          <!-- Instructions Section -->
+          <div class="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-200">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 flex items-center justify-center text-white font-bold">
+                📝
+              </div>
+              <div>
+                <h3 class="text-xl font-bold text-gray-900">Instrukcja krok po kroku</h3>
+                <p class="text-sm text-gray-500">Zadanie praktyczne do wykonania</p>
+              </div>
+            </div>
+
+            <!-- Rich content with images -->
+            <div class="prose max-w-none">
+              <div class="bg-pink-50 border-l-4 border-pink-500 p-4 mb-6">
+                <p class="text-sm font-semibold text-pink-900 mb-1">🎯 Cel zadania</p>
+                <p class="text-sm text-pink-800">Stwórz hero section dla własnego landing page używając poznanych technik</p>
+              </div>
+
+              <h4 class="text-lg font-bold text-gray-900 mb-3">Krok 1: Zidentyfikuj główny problem</h4>
+              <p class="text-gray-600 mb-4">Zanim napiszesz cokolwiek, odpowiedz na pytanie: jaki największy ból rozwiązuje Twój produkt? Zapisz to w jednym zdaniu.</p>
+              
+              <div class="bg-gray-100 rounded-lg p-4 mb-6">
+                <p class="text-sm font-mono text-gray-700">Przykład: "Spędzasz 5h dziennie na ręcznym zbieraniu leadów z LinkedIn"</p>
+              </div>
+
+              <h4 class="text-lg font-bold text-gray-900 mb-3">Krok 2: Napisz wartość w formule PAS</h4>
+              <p class="text-gray-600 mb-4">Problem → Agitate → Solution</p>
+              
+              <ul class="space-y-2 mb-6">
+                <li class="flex items-start gap-2">
+                  <span class="text-pink-600 font-bold">•</span>
+                  <span class="text-gray-600"><strong>Problem:</strong> Ręczne zbieranie leadów</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-pink-600 font-bold">•</span>
+                  <span class="text-gray-600"><strong>Agitate:</strong> Tracisz 25h tygodniowo na mechaniczną robotę</span>
+                </li>
+                <li class="flex items-start gap-2">
+                  <span class="text-pink-600 font-bold">•</span>
+                  <span class="text-gray-600"><strong>Solution:</strong> Automatyzacja która działa 24/7</span>
+                </li>
+              </ul>
+
+              <!-- Example image placeholder -->
+              <div class="bg-gradient-to-r from-pink-100 to-purple-100 rounded-lg p-8 mb-6 text-center">
+                <div class="text-6xl mb-4">🖼️</div>
+                <p class="text-sm text-gray-600">Tutaj będzie screenshot przykładowego hero section</p>
+                <p class="text-xs text-gray-500 mt-2">(Możesz dodać własne obrazki przez hosting typu Imgur, Cloudinary)</p>
+              </div>
+
+              <h4 class="text-lg font-bold text-gray-900 mb-3">Krok 3: Dodaj proof element</h4>
+              <p class="text-gray-600 mb-4">Liczby, social proof, lub konkretny wynik:</p>
+              
+              <div class="grid grid-cols-3 gap-4 mb-6">
+                <div class="bg-white border-2 border-gray-200 rounded-lg p-4 text-center">
+                  <div class="text-2xl font-bold text-pink-600">500+</div>
+                  <div class="text-xs text-gray-500">Firm używa</div>
+                </div>
+                <div class="bg-white border-2 border-gray-200 rounded-lg p-4 text-center">
+                  <div class="text-2xl font-bold text-pink-600">25h</div>
+                  <div class="text-xs text-gray-500">Zaoszczędzone</div>
+                </div>
+                <div class="bg-white border-2 border-gray-200 rounded-lg p-4 text-center">
+                  <div class="text-2xl font-bold text-pink-600">98%</div>
+                  <div class="text-xs text-gray-500">Satisfaction</div>
+                </div>
+              </div>
+
+              <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-6">
+                <p class="text-sm font-semibold text-green-900 mb-1">✅ Zadanie</p>
+                <p class="text-sm text-green-800">Wyślij swój hero section na forum kursu i otrzymaj feedback od społeczności!</p>
+              </div>
+
+              <div class="flex gap-3">
+                <button class="flex-1 bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition">
+                  ✓ Oznacz jako ukończone
+                </button>
+                <button class="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:border-pink-500 transition">
+                  💬 Zadaj pytanie
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Additional Resources -->
+          <div class="bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl p-4 sm:p-6 border border-pink-200">
+            <h4 class="font-bold text-gray-900 mb-3">📚 Dodatkowe zasoby</h4>
+            <div class="space-y-2">
+              <a href="#" class="flex items-center gap-3 p-3 bg-white rounded-lg hover:shadow-md transition">
+                <span class="text-2xl">🔗</span>
+                <div class="flex-1">
+                  <div class="font-semibold text-gray-900">50 przykładów hero sections</div>
+                  <div class="text-xs text-gray-500">Swipe file z najlepszych landing pages</div>
+                </div>
+                <span class="text-pink-600">→</span>
+              </a>
+              <a href="#" class="flex items-center gap-3 p-3 bg-white rounded-lg hover:shadow-md transition">
+                <span class="text-2xl">🎨</span>
+                <div class="flex-1">
+                  <div class="font-semibold text-gray-900">Figma template</div>
+                  <div class="text-xs text-gray-500">Gotowy szablon do zaprojektowania hero</div>
+                </div>
+                <span class="text-pink-600">→</span>
+              </a>
+              <a href="#" class="flex items-center gap-3 p-3 bg-white rounded-lg hover:shadow-md transition">
+                <span class="text-2xl">💻</span>
+                <div class="flex-1">
+                  <div class="font-semibold text-gray-900">HTML/CSS snippet</div>
+                  <div class="text-xs text-gray-500">Kod gotowy do wklejenia</div>
+                </div>
+                <span class="text-pink-600">→</span>
+              </a>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -942,6 +1196,15 @@
           <input type="password" id="loginPassword" class="input-field" placeholder="••••••••" required>
         </div>
 
+        <!-- Demo credentials info -->
+        <div class="bg-pink-900/20 border border-pink-500/30 rounded-lg p-3 text-sm">
+          <div class="text-pink-300 font-semibold mb-1">🎯 Demo (testowy dostęp):</div>
+          <div class="text-gray-300 text-xs">
+            Email: <code class="bg-black/30 px-1 rounded">demo@imperium.pl</code><br>
+            Hasło: <code class="bg-black/30 px-1 rounded">demo123</code>
+          </div>
+        </div>
+
         <div id="loginError" class="hidden text-red-400 text-sm"></div>
         
         <button type="submit" class="btn-primary w-full text-white px-6 py-3 rounded-full font-bold">
@@ -964,6 +1227,16 @@
       </div>
       
       <form onsubmit="handleRegister(event)" class="space-y-4">
+        <!-- Demo credentials info -->
+        <div class="bg-pink-900/20 border border-pink-500/30 rounded-lg p-3 text-sm mb-4">
+          <div class="text-pink-300 font-semibold mb-1">🎯 Chcesz tylko przetestować?</div>
+          <div class="text-gray-300 text-xs">
+            Użyj demo konta bez rejestracji:<br>
+            Email: <code class="bg-black/30 px-1 rounded">demo@imperium.pl</code><br>
+            Hasło: <code class="bg-black/30 px-1 rounded">demo123</code>
+          </div>
+        </div>
+
         <div>
           <label class="block text-sm font-medium text-gray-300 mb-2">Imię</label>
           <input type="text" id="registerName" class="input-field" placeholder="Jan Kowalski" required>
@@ -992,7 +1265,7 @@
     </div>
   </div>
 
-  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     // Firebase Configuration (REPLACE WITH YOUR CONFIG)
     const firebaseConfig = {
       apiKey: "YOUR_API_KEY",
@@ -1053,6 +1326,19 @@
       const password = document.getElementById('loginPassword').value;
       const errorDiv = document.getElementById('loginError');
 
+      // DEMO MODE - testowy login
+      if (email === 'demo@imperium.pl' && password === 'demo123') {
+        const demoUser = {
+          email: 'demo@imperium.pl',
+          displayName: 'Demo User',
+          uid: 'demo-user-123'
+        };
+        showDashboard(demoUser);
+        closeLoginModal();
+        return;
+      }
+
+      // Firebase auth (jeśli skonfigurowane)
       try {
         await auth.signInWithEmailAndPassword(email, password);
         closeLoginModal();
@@ -1132,17 +1418,4 @@
     }
 
     // Smooth scroll
-    function scrollToSection(sectionId) {
-      document.getElementById(sectionId).scrollIntoView({ 
-        behavior: 'smooth' 
-      });
-    }
-
-    // Mobile menu toggle
-    function toggleMobileMenu() {
-      const mobileMenu = document.getElementById('mobileMenu');
-      mobileMenu.classList.toggle('hidden');
-    }
-
-    // Close modals on outside click
-    window.onclick = f
+    function scrollToSection(sec
