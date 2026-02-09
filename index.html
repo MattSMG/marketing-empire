@@ -1265,7 +1265,7 @@
     </div>
   </div>
 
-  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  <script>
     // Firebase Configuration (REPLACE WITH YOUR CONFIG)
     const firebaseConfig = {
       apiKey: "YOUR_API_KEY",
@@ -1276,18 +1276,31 @@
       appId: "YOUR_APP_ID"
     };
 
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
+    // Check if Firebase is configured
+    const isFirebaseConfigured = firebaseConfig.apiKey !== "YOUR_API_KEY";
+    let auth = null;
 
-    // Check auth state on load
-    auth.onAuthStateChanged((user) => {
-      if (user) {
-        showDashboard(user);
-      } else {
-        showLanding();
+    // Initialize Firebase only if configured
+    if (isFirebaseConfigured && typeof firebase !== 'undefined') {
+      try {
+        firebase.initializeApp(firebaseConfig);
+        auth = firebase.auth();
+
+        // Check auth state on load
+        auth.onAuthStateChanged((user) => {
+          if (user) {
+            showDashboard(user);
+          } else {
+            showLanding();
+          }
+        });
+      } catch (error) {
+        console.warn('Firebase initialization failed:', error);
       }
-    });
+    } else {
+      // No Firebase - just show landing
+      showLanding();
+    }
 
     // Modal functions
     function openLoginModal() {
@@ -1339,11 +1352,16 @@
       }
 
       // Firebase auth (jeśli skonfigurowane)
-      try {
-        await auth.signInWithEmailAndPassword(email, password);
-        closeLoginModal();
-      } catch (error) {
-        errorDiv.textContent = getErrorMessage(error.code);
+      if (auth) {
+        try {
+          await auth.signInWithEmailAndPassword(email, password);
+          closeLoginModal();
+        } catch (error) {
+          errorDiv.textContent = getErrorMessage(error.code);
+          errorDiv.classList.remove('hidden');
+        }
+      } else {
+        errorDiv.textContent = 'Firebase nie jest skonfigurowany. Użyj demo@imperium.pl / demo123';
         errorDiv.classList.remove('hidden');
       }
     }
@@ -1357,21 +1375,28 @@
       const password = document.getElementById('registerPassword').value;
       const errorDiv = document.getElementById('registerError');
 
-      try {
-        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-        await userCredential.user.updateProfile({
-          displayName: name
-        });
-        closeRegisterModal();
-      } catch (error) {
-        errorDiv.textContent = getErrorMessage(error.code);
+      if (auth) {
+        try {
+          const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+          await userCredential.user.updateProfile({
+            displayName: name
+          });
+          closeRegisterModal();
+        } catch (error) {
+          errorDiv.textContent = getErrorMessage(error.code);
+          errorDiv.classList.remove('hidden');
+        }
+      } else {
+        errorDiv.textContent = 'Rejestracja niedostępna bez Firebase. Użyj demo@imperium.pl / demo123';
         errorDiv.classList.remove('hidden');
       }
     }
 
     // Logout
     async function logout() {
-      await auth.signOut();
+      if (auth && auth.currentUser) {
+        await auth.signOut();
+      }
       showLanding();
     }
 
