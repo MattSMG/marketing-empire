@@ -5,8 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Marketingowe Imperium - Platforma Kursów</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
     
@@ -1265,182 +1264,184 @@
     </div>
   </div>
 
-  <script>
-    // Firebase Configuration (REPLACE WITH YOUR CONFIG)
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
-    };
+ <script>
+  // Backend API URL - ZMIEŃ PO WRZUCENIU NA RAILWAY
+  const API_URL = 'marketing-empire-production.up.railway.app'; 
+  // Po deploymencie: const API_URL = 'https://TWOJA-NAZWA.up.railway.app';
 
-    // Check if Firebase is configured
-    const isFirebaseConfigured = firebaseConfig.apiKey !== "YOUR_API_KEY";
-    let auth = null;
-
-    // Initialize Firebase only if configured
-    if (isFirebaseConfigured && typeof firebase !== 'undefined') {
+  // Check for stored token on page load
+  window.addEventListener('DOMContentLoaded', async () => {
+    const token = localStorage.getItem('authToken');
+    
+    if (token) {
       try {
-        firebase.initializeApp(firebaseConfig);
-        auth = firebase.auth();
-
-        // Check auth state on load
-        auth.onAuthStateChanged((user) => {
-          if (user) {
-            showDashboard(user);
-          } else {
-            showLanding();
-          }
+        const response = await fetch(`${API_URL}/api/verify`, {
+          headers: { 'Authorization': `Bearer ${token}` }
         });
+
+        if (response.ok) {
+          const data = await response.json();
+          showDashboard(data.user);
+        } else {
+          localStorage.removeItem('authToken');
+          showLanding();
+        }
       } catch (error) {
-        console.warn('Firebase initialization failed:', error);
+        console.error('Verify error:', error);
+        showLanding();
       }
     } else {
-      // No Firebase - just show landing
       showLanding();
     }
+  });
 
-    // Modal functions
-    function openLoginModal() {
-      document.getElementById('loginModal').classList.add('active');
-    }
+  // Modal functions
+  function openLoginModal() {
+    document.getElementById('loginModal').classList.add('active');
+  }
 
-    function closeLoginModal() {
-      document.getElementById('loginModal').classList.remove('active');
-      document.getElementById('loginError').classList.add('hidden');
-    }
+  function closeLoginModal() {
+    document.getElementById('loginModal').classList.remove('active');
+    document.getElementById('loginError').classList.add('hidden');
+  }
 
-    function openRegisterModal() {
-      document.getElementById('registerModal').classList.add('active');
-    }
+  function openRegisterModal() {
+    document.getElementById('registerModal').classList.add('active');
+  }
 
-    function closeRegisterModal() {
-      document.getElementById('registerModal').classList.remove('active');
-      document.getElementById('registerError').classList.add('hidden');
-    }
+  function closeRegisterModal() {
+    document.getElementById('registerModal').classList.remove('active');
+    document.getElementById('registerError').classList.add('hidden');
+  }
 
-    function switchToRegister() {
-      closeLoginModal();
-      openRegisterModal();
-    }
+  function switchToRegister() {
+    closeLoginModal();
+    openRegisterModal();
+  }
 
-    function switchToLogin() {
-      closeRegisterModal();
-      openLoginModal();
-    }
+  function switchToLogin() {
+    closeRegisterModal();
+    openLoginModal();
+  }
 
-    // Handle Login
-    async function handleLogin(e) {
-      e.preventDefault();
-      
-      const email = document.getElementById('loginEmail').value;
-      const password = document.getElementById('loginPassword').value;
-      const errorDiv = document.getElementById('loginError');
+  // Handle Login
+  async function handleLogin(e) {
+    e.preventDefault();
+    
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    const errorDiv = document.getElementById('loginError');
 
-      // DEMO MODE - testowy login
-      if (email === 'demo@imperium.pl' && password === 'demo123') {
-        const demoUser = {
-          email: 'demo@imperium.pl',
-          displayName: 'Demo User',
-          uid: 'demo-user-123'
-        };
-        showDashboard(demoUser);
-        closeLoginModal();
+    try {
+      const response = await fetch(`${API_URL}/api/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        errorDiv.textContent = data.error || 'Błąd logowania';
+        errorDiv.classList.remove('hidden');
         return;
       }
 
-      // Firebase auth (jeśli skonfigurowane)
-      if (auth) {
-        try {
-          await auth.signInWithEmailAndPassword(email, password);
-          closeLoginModal();
-        } catch (error) {
-          errorDiv.textContent = getErrorMessage(error.code);
-          errorDiv.classList.remove('hidden');
-        }
-      } else {
-        errorDiv.textContent = 'Firebase nie jest skonfigurowany. Użyj demo@imperium.pl / demo123';
+      localStorage.setItem('authToken', data.token);
+      showDashboard(data.user);
+      closeLoginModal();
+
+    } catch (error) {
+      console.error('Login error:', error);
+      errorDiv.textContent = 'Błąd połączenia z serwerem';
+      errorDiv.classList.remove('hidden');
+    }
+  }
+
+  // Handle Register
+  async function handleRegister(e) {
+    e.preventDefault();
+    
+    const name = document.getElementById('registerName').value;
+    const email = document.getElementById('registerEmail').value;
+    const password = document.getElementById('registerPassword').value;
+    const errorDiv = document.getElementById('registerError');
+
+    try {
+      const response = await fetch(`${API_URL}/api/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, name })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        errorDiv.textContent = data.error || 'Błąd rejestracji';
         errorDiv.classList.remove('hidden');
+        return;
       }
+
+      localStorage.setItem('authToken', data.token);
+      showDashboard(data.user);
+      closeRegisterModal();
+
+    } catch (error) {
+      console.error('Register error:', error);
+      errorDiv.textContent = 'Błąd połączenia z serwerem';
+      errorDiv.classList.remove('hidden');
     }
+  }
 
-    // Handle Register
-    async function handleRegister(e) {
-      e.preventDefault();
-      
-      const name = document.getElementById('registerName').value;
-      const email = document.getElementById('registerEmail').value;
-      const password = document.getElementById('registerPassword').value;
-      const errorDiv = document.getElementById('registerError');
+  // Logout
+  function logout() {
+    localStorage.removeItem('authToken');
+    showLanding();
+  }
 
-      if (auth) {
-        try {
-          const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-          await userCredential.user.updateProfile({
-            displayName: name
-          });
-          closeRegisterModal();
-        } catch (error) {
-          errorDiv.textContent = getErrorMessage(error.code);
-          errorDiv.classList.remove('hidden');
-        }
-      } else {
-        errorDiv.textContent = 'Rejestracja niedostępna bez Firebase. Użyj demo@imperium.pl / demo123';
-        errorDiv.classList.remove('hidden');
-      }
-    }
+  // Show Dashboard
+  function showDashboard(user) {
+    document.getElementById('landingView').classList.add('hidden');
+    document.getElementById('dashboardView').classList.remove('hidden');
+    
+    const displayName = user.name || user.email.split('@')[0];
+    document.getElementById('userName').textContent = displayName;
+    document.getElementById('userEmail').textContent = user.email;
+  }
 
-    // Logout
-    async function logout() {
-      if (auth && auth.currentUser) {
-        await auth.signOut();
-      }
-      showLanding();
-    }
+  // Show Landing
+  function showLanding() {
+    document.getElementById('landingView').classList.remove('hidden');
+    document.getElementById('dashboardView').classList.add('hidden');
+  }
 
-    // Show Dashboard
-    function showDashboard(user) {
-      document.getElementById('landingView').classList.add('hidden');
-      document.getElementById('dashboardView').classList.remove('hidden');
-      
-      const displayName = user.displayName || user.email.split('@')[0];
-      document.getElementById('userName').textContent = displayName;
-      document.getElementById('userEmail').textContent = user.email;
-    }
+  // Tab switching
+  function switchTab(tabName) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
+    
+    document.getElementById(`content-${tabName}`).classList.remove('hidden');
+    document.getElementById(`tab-${tabName}`).classList.add('active');
+  }
 
-    // Show Landing
-    function showLanding() {
-      document.getElementById('landingView').classList.remove('hidden');
-      document.getElementById('dashboardView').classList.add('hidden');
-    }
+  // Scroll function
+  function scrollToSection(sectionId) {
+    document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+  }
 
-    // Tab switching
-    function switchTab(tabName) {
-      // Hide all content
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-      // Remove active from all buttons
-      document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
-      
-      // Show selected content
-      document.getElementById(`content-${tabName}`).classList.remove('hidden');
-      // Add active to selected button
-      document.getElementById(`tab-${tabName}`).classList.add('active');
-    }
+  // Mobile menu
+  function toggleMobileMenu() {
+    document.getElementById('mobileMenu').classList.toggle('hidden');
+  }
 
-    // Error messages in Polish
-    function getErrorMessage(code) {
-      const messages = {
-        'auth/email-already-in-use': 'Ten email jest już zarejestrowany',
-        'auth/invalid-email': 'Nieprawidłowy adres email',
-        'auth/user-not-found': 'Nie znaleziono użytkownika',
-        'auth/wrong-password': 'Nieprawidłowe hasło',
-        'auth/weak-password': 'Hasło jest za słabe (min. 6 znaków)',
-        'auth/too-many-requests': 'Zbyt wiele prób. Spróbuj później'
-      };
-      return messages[code] || 'Wystąpił błąd. Spróbuj ponownie';
-    }
-
-    // Smooth scroll
-    function scrollToSection(sec
+  // Close modals on outside click
+  window.onclick = function(event) {
+    const loginModal = document.getElementById('loginModal');
+    const registerModal = document.getElementById('registerModal');
+    
+    if (event.target === loginModal) closeLoginModal();
+    if (event.target === registerModal) closeRegisterModal();
+  }
+</script>
+</body>
+</html>
