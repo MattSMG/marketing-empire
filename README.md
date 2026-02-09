@@ -1,2 +1,0 @@
-# marketing-empire
-Ekspansja!
