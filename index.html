@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="pl" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Marketingowe Imperium - Platforma Kursów</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+    
+    * {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    .gradient-bg {
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .waves-container {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .wave {
+      position: absolute;
+      width: 200%;
+      height: 100%;
+      left: -50%;
+      opacity: 0.3;
+    }
+
+    .wave-1 {
+      animation: wave-animation 20s ease-in-out infinite;
+      fill: url(#gradient-1);
+    }
+
+    .wave-2 {
+      animation: wave-animation 15s ease-in-out infinite reverse;
+      fill: url(#gradient-2);
+      animation-delay: -5s;
+    }
+
+    .wave-3 {
+      animation: wave-animation 25s ease-in-out infinite;
+      fill: url(#gradient-3);
+      animation-delay: -10s;
+    }
+
+    @keyframes wave-animation {
+      0%, 100% { transform: translateX(0) translateY(0); }
+      50% { transform: translateX(-25%) translateY(10px); }
+    }
+
+    .content-layer {
+      position: relative;
+      z-index: 10;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 2rem;
+      transition: all 0.3s ease;
+    }
+
+    .glass-card:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateY(-5px);
+      box-shadow: 0 20px 60px rgba(219, 39, 119, 0.3);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #db2777 0%, #9333ea 100%);
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 30px rgba(219, 39, 119, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 40px rgba(219, 39, 119, 0.5);
+    }
+
+    .cityscape {
+      filter: drop-shadow(0 0 20px rgba(219, 39, 119, 0.5));
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(5px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: rgba(26, 26, 46, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 2.5rem;
+      max-width: 450px;
+      width: 90%;
+      position: relative;
+    }
+
+    .input-field {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 12px 16px;
+      width: 100%;
+      color: white;
+      transition: all 0.3s ease;
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: #db2777;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .course-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .course-card:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateY(-3px);
+      border-color: #db2777;
+    }
+
+    .progress-bar {
+      background: rgba(255, 255, 255, 0.1);
+      height: 8px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      background: linear-gradient(90deg, #db2777 0%, #9333ea 100%);
+      height: 100%;
+      transition: width 0.5s ease;
+    }
+
+    .badge {
+      background: linear-gradient(135deg, #db2777 0%, #9333ea 100%);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .tab-button {
+      padding: 12px 24px;
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-bottom: 2px solid transparent;
+      font-weight: 600;
+    }
+
+    .tab-button.active {
+      color: white;
+      border-bottom-color: #db2777;
+    }
+
+    .tab-button:hover {
+      color: white;
+    }
+
+    /* Mobile Responsive Styles */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2.5rem;
+        line-height: 1.1;
+      }
+
+      .hero-section h1 {
+        font-size: 2.25rem;
+      }
+
+      .glass-card {
+        padding: 1.5rem;
+      }
+
+      .modal-content {
+        padding: 1.5rem;
+        margin: 1rem;
+      }
+
+      .cityscape {
+        max-height: 250px;
+      }
+
+      .course-card {
+        padding: 1.25rem;
+      }
+
+      .badge {
+        font-size: 0.7rem;
+        padding: 3px 10px;
+      }
+
+      .tab-button {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .btn-primary {
+        padding: 12px 24px;
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      .text-5xl {
+        font-size: 2rem;
+      }
+
+      .text-7xl {
+        font-size: 2.5rem;
+      }
+
+      .glass-card {
+        padding: 1rem;
+      }
+
+      .modal-content {
+        width: 95%;
+        padding: 1.25rem;
+      }
+
+      .course-card {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body class="h-full">
+
+  <!-- Landing Page View -->
+  <div id="landingView" class="gradient-bg min-h-screen">
+    <!-- Animated Waves Background -->
+    <div class="waves-container">
+      <svg class="wave wave-1" viewBox="0 0 1440 320" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="gradient-1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#db2777;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#9333ea;stop-opacity:1" />
+          </linearGradient>
+        </defs>
+        <path d="M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,154.7C672,160,768,224,864,240C960,256,1056,224,1152,197.3C1248,171,1344,149,1392,138.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+      </svg>
+      
+      <svg class="wave wave-2" viewBox="0 0 1440 320" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="gradient-2" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#9333ea;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#db2777;stop-opacity:1" />
+          </linearGradient>
+        </defs>
+        <path d="M0,96L48,112C96,128,192,160,288,165.3C384,171,480,149,576,133.3C672,117,768,107,864,122.7C960,139,1056,181,1152,181.3C1248,181,1344,139,1392,117.3L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+      </svg>
+      
+      <svg class="wave wave-3" viewBox="0 0 1440 320" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="gradient-3" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#db2777;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
+          </linearGradient>
+        </defs>
+        <path d="M0,224L48,213.3C96,203,192,181,288,186.7C384,192,480,224,576,213.3C672,203,768,149,864,128C960,107,1056,117,1152,138.7C1248,160,1344,192,1392,208L1440,224L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+      </svg>
+    </div>
+
+    <!-- Content Layer -->
+    <div class="content-layer">
+      <!-- Navbar -->
+      <nav class="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
+        <div class="flex items-center justify-between">
+          <div class="text-xl sm:text-2xl font-black text-white tracking-tight">
+            <span class="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">IMPERIUM</span>
+          </div>
+          
+          <div class="hidden md:flex items-center space-x-8">
+            <a href="#about" class="text-white hover:text-pink-400 transition font-medium">O nas</a>
+            <a href="#project" class="text-white hover:text-pink-400 transition font-medium">Projekt</a>
+            <a href="#contact" class="text-white hover:text-pink-400 transition font-medium">Kontakt</a>
+            <button onclick="openLoginModal()" class="btn-primary text-white px-6 py-2.5 rounded-full font-semibold">
+              Zaloguj się
+            </button>
+          </div>
+
+          <!-- Mobile menu -->
+          <div id="mobileMenu" class="hidden md:hidden">
+            <div class="absolute top-16 right-4 bg-gray-900 rounded-xl p-4 shadow-xl border border-gray-700 z-50">
+              <a href="#about" class="block text-white hover:text-pink-400 transition font-medium py-2">O nas</a>
+              <a href="#project" class="block text-white hover:text-pink-400 transition font-medium py-2">Projekt</a>
+              <a href="#contact" class="block text-white hover:text-pink-400 transition font-medium py-2">Kontakt</a>
+              <button onclick="openLoginModal()" class="btn-primary text-white px-6 py-2 rounded-full font-semibold w-full mt-2">
+                Zaloguj się
+              </button>
+            </div>
+          </div>
+
+          <!-- Mobile menu button -->
+          <button class="md:hidden text-white" onclick="toggleMobileMenu()">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+        </div>
+      </nav>
+
+      <!-- Hero Section -->
+      <div class="container mx-auto px-4 sm:px-6 py-12 sm:py-20 md:py-32">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
+          <!-- Left: Text Content -->
+          <div class="text-white space-y-6 sm:space-y-8 text-center md:text-left">
+            <div class="inline-block">
+              <span class="badge">🚀 Nowa platforma</span>
+            </div>
+            
+            <h1 class="text-4xl sm:text-5xl md:text-7xl font-black leading-tight">
+              ZBUDUJ SWOJE
+              <span class="block bg-gradient-to-r from-pink-500 via-purple-500 to-pink-600 bg-clip-text text-transparent">
+                MARKETINGOWE
+              </span>
+              <span class="block bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
+                IMPERIUM
+              </span>
+            </h1>
+            
+            <p class="text-base sm:text-xl text-gray-300 leading-relaxed px-4 sm:px-0">
+              Kursy, narzędzia i strategie które zamieniają wiedzę w gotówkę. 
+              <span class="text-pink-400 font-semibold">Marketing to fundament ekspansji każdego biznesu.</span>
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 px-4 sm:px-0">
+              <button onclick="openRegisterModal()" class="btn-primary text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full text-base sm:text-lg font-bold">
+                Zacznij teraz →
+              </button>
+              <button onclick="scrollToSection('project')" class="glass-card text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full text-base sm:text-lg font-semibold hover:bg-white/10">
+                Dowiedz się więcej
+              </button>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 sm:gap-8 pt-4 px-4 sm:px-0">
+              <div class="text-center md:text-left">
+                <div class="text-2xl sm:text-3xl font-bold text-white">500+</div>
+                <div class="text-xs sm:text-sm text-gray-400">Użytkowników</div>
+              </div>
+              <div class="text-center md:text-left">
+                <div class="text-2xl sm:text-3xl font-bold text-white">50+</div>
+                <div class="text-xs sm:text-sm text-gray-400">Kursów</div>
+              </div>
+              <div class="text-center md:text-left">
+                <div class="text-2xl sm:text-3xl font-bold text-white">98%</div>
+                <div class="text-xs sm:text-sm text-gray-400">Zadowolenia</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Cityscape SVG -->
+          <div class="relative">
+            <svg class="cityscape w-full h-auto" viewBox="0 0 800 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Background glow -->
+              <defs>
+                <linearGradient id="city-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color:#db2777;stop-opacity:1" />
+                  <stop offset="100%" style="stop-color:#9333ea;stop-opacity:1" />
+                </linearGradient>
+                <linearGradient id="glass-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.3" />
+                  <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0.05" />
+                </linearGradient>
+                <filter id="glow">
+                  <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                  <feMerge>
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+              </defs>
+
+              <!-- Ground glow effect -->
+              <ellipse cx="400" cy="480" rx="350" ry="20" fill="url(#city-gradient)" opacity="0.3" filter="url(#glow)"/>
+
+              <!-- Background buildings (shorter) -->
+              <g opacity="0.3">
+                <rect x="80" y="350" width="45" height="150" stroke="url(#city-gradient)" stroke-width="1.5" fill="rgba(219, 39, 119, 0.05)"/>
+                <rect x="140" y="320" width="50" height="180" stroke="url(#city-gradient)" stroke-width="1.5" fill="rgba(219, 39, 119, 0.05)"/>
+                <rect x="210" y="340" width="40" height="160" stroke="url(#city-gradient)" stroke-width="1.5" fill="rgba(219, 39, 119, 0.05)"/>
+              </g>
+
+              <!-- Mid-tier buildings -->
+              <g opacity="0.5">
+                <!-- Left curved tower -->
+                <path d="M 280 280 Q 275 250 280 220 L 280 500 L 330 500 L 330 220 Q 335 250 330 280 Z" 
+                      stroke="url(#city-gradient)" stroke-width="2" fill="rgba(147, 51, 234, 0.08)"/>
+                <!-- Glass effect -->
+                <path d="M 285 240 L 285 480 L 295 480 L 295 240 Z" fill="url(#glass-gradient)" opacity="0.5"/>
+                
+                <!-- Right stepped tower -->
+                <rect x="600" y="260" width="60" height="240" stroke="url(#city-gradient)" stroke-width="2" fill="rgba(219, 39, 119, 0.08)"/>
+                <rect x="605" y="240" width="50" height="20" stroke="url(#city-gradient)" stroke-width="1.5" fill="rgba(219, 39, 119, 0.1)"/>
+                <!-- Windows pattern -->
+                <g opacity="0.6">
+                  <rect x="615" y="280" width="8" height="12" fill="url(#city-gradient)"/>
+                  <rect x="637" y="280" width="8" height="12" fill="url(#city-gradient)"/>
+                  <rect x="615" y="310" width="8" height="12" fill="url(#city-gradient)"/>
+                  <rect x="637" y="310" width="8" height="12" fill="url(#city-gradient)"/>
+                  <rect x="615" y="340" width="8" height="12" fill="url(#city-gradient)"/>
+                  <rect x="637" y="340" width="8" height="12" fill="url(#city-gradient)"/>
+                </g>
+              </g>
+
+              <!-- Main centerpiece - Burj Khalifa inspired (tallest, growing animation) -->
+              <g filter="url(#glow)">
+                <!-- Base section -->
+                <path d="M 380 500 L 380 200 L 400 180 L 420 200 L 420 500 Z" 
+                      stroke="url(#city-gradient)" stroke-width="3" fill="rgba(219, 39, 119, 0.15)">
+                  <animate attributeName="d" 
+                           values="M 380 500 L 380 500 L 400 500 L 420 500 L 420 500 Z;
+                                   M 380 500 L 380 200 L 400 180 L 420 200 L 420 500 Z" 
+                           dur="2s" repeatCount="1"/>
+                </path>
+                
+                <!-- Middle taper -->
+                <path d="M 385 200 L 385 120 L 400 100 L 415 120 L 415 200 Z" 
+                      stroke="url(#city-gradient)" stroke-width="2.5" fill="rgba(147, 51, 234, 0.2)">
+                  <animate attributeName="d" 
+                           values="M 385 500 L 385 500 L 400 500 L 415 500 L 415 500 Z;
+                                   M 385 200 L 385 120 L 400 100 L 415 120 L 415 200 Z" 
+                           dur="2s" repeatCount="1"/>
+                </path>
+                
+                <!-- Top spire -->
+                <path d="M 390 100 L 390 60 L 400 40 L 410 60 L 410 100 Z" 
+                      stroke="url(#city-gradient)" stroke-width="2" fill="rgba(219, 39, 119, 0.25)">
+                  <animate attributeName="d" 
+                           values="M 390 500 L 390 500 L 400 500 L 410 500 L 410 500 Z;
+                                   M 390 100 L 390 60 L 400 40 L 410 60 L 410 100 Z" 
+                           dur="2s" repeatCount="1"/>
+                </path>
+                
+                <!-- Antenna -->
+                <line x1="400" y1="40" x2="400" y2="15" stroke="url(#city-gradient)" stroke-width="2">
+                  <animate attributeName="y1" values="500;40" dur="2s" repeatCount="1"/>
+                  <animate attributeName="y2" values="500;15" dur="2s" repeatCount="1"/>
+                </line>
+                <circle cx="400" cy="15" r="6" fill="#db2777" filter="url(#glow)">
+                  <animate attributeName="cy" values="500;15" dur="2s" repeatCount="1"/>
+                  <animate attributeName="r" values="0;6" dur="2s" repeatCount="1"/>
+                </circle>
+                
+                <!-- Glass reflections on main tower -->
+                <path d="M 390 220 L 390 150 L 395 145 L 395 220 Z" fill="url(#glass-gradient)" opacity="0.7">
+                  <animate attributeName="d" 
+                           values="M 390 500 L 390 500 L 395 500 L 395 500 Z;
+                                   M 390 220 L 390 150 L 395 145 L 395 220 Z" 
+                           dur="2s" repeatCount="1"/>
+                </path>
+                
+                <!-- Windows pattern on main tower -->
+                <g opacity="0.8">
+                  <rect x="392" y="240" width="5" height="8" fill="url(#city-gradient)">
+                    <animate attributeName="y" values="500;240" dur="2s" repeatCount="1"/>
+                  </rect>
+                  <rect x="403" y="240" width="5" height="8" fill="url(#city-gradient)">
+                    <animate attributeName="y" values="500;240" dur="2s" repeatCount="1"/>
+                  </rect>
+                  <rect x="392" y="270" width="5" height="8" fill="url(#city-gradient)">
+                    <animate attributeName="y" values="500;270" dur="2s" repeatCount="1"/>
+                  </rect>
+                  <rect x="403" y="270" width="5" height="8" fill="url(#city-gradient)">
+                    <animate attributeName="y" values="500;270" dur="2s" repeatCount="1"/>
+                  </rect>
+                  <rect x="392" y="300" width="5" height="8" fill="url(#city-gradient)">
+                    <animate attributeName="y" values="500;300" dur="2s" repeatCount="1"/>
+                  </rect>
+                  <rect x="403" y="300" width="5" height="8" fill="url(#city-gradient)">
+                    <animate attributeName="y" values="500;300" dur="2s" repeatCount="1"/>
+                  </rect>
+                </g>
+              </g>
+
+              <!-- Left foreground - Marina Bay Sands inspired (3 towers with platform) -->
+              <g opacity="0.7">
+                <!-- Tower 1 -->
+                <rect x="120" y="280" width="35" height="220" stroke="url(#city-gradient)" stroke-width="2" fill="rgba(219, 39, 119, 0.1)"/>
+                <!-- Tower 2 -->
+                <rect x="165" y="280" width="35" height="220" stroke="url(#city-gradient)" stroke-width="2" fill="rgba(219, 39, 119, 0.1)"/>
+                <!-- Tower 3 -->
+                <rect x="210" y="280" width="35" height="220" stroke="url(#city-gradient)" stroke-width="2" fill="rgba(219, 39, 119, 0.1)"/>
+                <!-- Sky platform connecting tops -->
+                <path d="M 115 280 Q 180 260 245 280 L 245 265 Q 180 245 115 265 Z" 
+                      stroke="url(#city-gradient)" stroke-width="2" fill="rgba(147, 51, 234, 0.2)"/>
+                <!-- Windows -->
+                <g opacity="0.6">
+                  <rect x="130" y="310" width="6" height="10" fill="url(#city-gradient)"/>
+                  <rect x="142" y="310" width="6" height="10" fill="url(#city-gradient)"/>
+                  <rect x="175" y="310" width="6" height="10" fill="url(#city-gradient)"/>
+                  <rect x="187" y="310" width="6" height="10" fill="url(#city-gradient)"/>
+                  <rect x="220" y="310" width="6" height="10" fill="url(#city-gradient)"/>
+                  <rect x="232" y="310" width="6" height="10" fill="url(#city-gradient)"/>
+                </g>
+              </g>
+
+              <!-- Right foreground - Twisted tower -->
+              <g opacity="0.7">
+                <path d="M 520 300 L 510 500 L 560 500 L 550 300 Z" 
+                      stroke="url(#city-gradient)" stroke-width="2.5" fill="rgba(147, 51, 234, 0.1)"/>
+                <!-- Helical effect lines -->
+                <path d="M 515 350 Q 535 365 545 350" stroke="url(#city-gradient)" stroke-width="1.5" fill="none" opacity="0.5"/>
+                <path d="M 515 390 Q 535 405 545 390" stroke="url(#city-gradient)" stroke-width="1.5" fill="none" opacity="0.5"/>
+                <path d="M 515 430 Q 535 445 545 430" stroke="url(#city-gradient)" stroke-width="1.5" fill="none" opacity="0.5"/>
+                <!-- Windows -->
+                <g opacity="0.6">
+                  <rect x="522" y="330" width="7" height="10" fill="url(#city-gradient)"/>
+                  <rect x="535" y="330" width="7" height="10" fill="url(#city-gradient)"/>
+                  <rect x="522" y="370" width="7" height="10" fill="url(#city-gradient)"/>
+                  <rect x="535" y="370" width="7" height="10" fill="url(#city-gradient)"/>
+                </g>
+              </g>
+
+              <!-- Ground line with glow -->
+              <line x1="0" y1="500" x2="800" y2="500" stroke="url(#city-gradient)" stroke-width="3" opacity="0.5" filter="url(#glow)"/>
+              
+              <!-- Atmospheric particles/lights -->
+              <circle cx="300" cy="150" r="2" fill="#db2777" opacity="0.6">
+                <animate attributeName="opacity" values="0.3;0.9;0.3" dur="3s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="500" cy="200" r="2" fill="#9333ea" opacity="0.6">
+                <animate attributeName="opacity" values="0.4;1;0.4" dur="4s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="250" cy="180" r="2" fill="#db2777" opacity="0.6">
+                <animate attributeName="opacity" values="0.5;0.8;0.5" dur="2.5s" repeatCount="indefinite"/>
+              </circle>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Features Section -->
+      <div class="container mx-auto px-4 sm:px-6 py-12 sm:py-20">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
+          <div class="glass-card text-center">
+            <div class="text-4xl sm:text-5xl mb-3 sm:mb-4">📚</div>
+            <h3 class="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3">Kursy premium</h3>
+            <p class="text-sm sm:text-base text-gray-300">Od podstaw do zaawansowanych strategii marketingowych</p>
+          </div>
+          
+          <div class="glass-card text-center">
+            <div class="text-4xl sm:text-5xl mb-3 sm:mb-4">🛠️</div>
+            <h3 class="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3">Narzędzia AI</h3>
+            <p class="text-sm sm:text-base text-gray-300">Automaty i boty które pracują za Ciebie 24/7</p>
+          </div>
+          
+          <div class="glass-card text-center sm:col-span-2 md:col-span-1">
+            <div class="text-4xl sm:text-5xl mb-3 sm:mb-4">💰</div>
+            <h3 class="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3">Produkty cyfrowe</h3>
+            <p class="text-sm sm:text-base text-gray-300">Szablony, PDF-y i gotowe rozwiązania do sprzedaży</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- About Section -->
+      <div id="about" class="container mx-auto px-4 sm:px-6 py-12 sm:py-20">
+        <div class="max-w-4xl mx-auto">
+          <h2 class="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-6 text-center">
+            O <span class="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">nas</span>
+          </h2>
+          <div class="glass-card">
+            <p class="text-gray-300 text-base sm:text-lg leading-relaxed mb-6">
+              Tworzymy ekosystem narzędzi i wiedzy dla przedsiębiorców, którzy chcą budować swoje marki osobiste i sprzedawać produkty cyfrowe.
+            </p>
+            <p class="text-gray-300 text-base sm:text-lg leading-relaxed">
+              Nasz zespół: <span class="text-pink-400 font-semibold">Mateusz</span> (tech & automation) + <span class="text-pink-400 font-semibold">Andżelika</span> (marketing & strategy). 
+              Łączymy wiedzę techniczną z praktycznymi strategiami sprzedażowymi.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Project Section -->
+      <div id="project" class="container mx-auto px-4 sm:px-6 py-12 sm:py-20">
+        <div class="max-w-4xl mx-auto">
+          <h2 class="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-8 sm:mb-12 text-center">
+            Projekt w <span class="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">skrócie</span>
+          </h2>
+          
+          <div class="space-y-4 sm:space-y-6">
+            <div class="glass-card">
+              <div class="flex items-start gap-3 sm:gap-4">
+                <div class="text-2xl sm:text-3xl">🎯</div>
+                <div>
+                  <h3 class="text-lg sm:text-xl font-bold text-white mb-2">Misja</h3>
+                  <p class="text-sm sm:text-base text-gray-300">Demokratyzacja dostępu do wiedzy marketingowej i narzędzi AI dla polskich przedsiębiorców.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="glass-card">
+              <div class="flex items-start gap-3 sm:gap-4">
+                <div class="text-2xl sm:text-3xl">📈</div>
+                <div>
+                  <h3 class="text-lg sm:text-xl font-bold text-white mb-2">Co oferujemy</h3>
+                  <ul class="text-sm sm:text-base text-gray-300 space-y-2">
+                    <li>• Kursy video z case studies i praktycznymi zadaniami</li>
+                    <li>• Materiały PDF do pobrania (checklists, templates, strategie)</li>
+                    <li>• Narzędzia AI (boty, automaty, generatory)</li>
+                    <li>• Społeczność przedsiębiorców i twórców</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="glass-card">
+              <div class="flex items-start gap-3 sm:gap-4">
+                <div class="text-2xl sm:text-3xl">⚡</div>
+                <div>
+                  <h3 class="text-lg sm:text-xl font-bold text-white mb-2">Dla kogo</h3>
+                  <p class="text-sm sm:text-base text-gray-300">Freelancerzy, solopreneurs, małe biznesy i każdy kto chce zarabiać na wiedzy i produktach cyfrowych.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Section -->
+      <div id="contact" class="container mx-auto px-4 sm:px-6 py-12 sm:py-20 pb-16 sm:pb-32">
+        <div class="max-w-2xl mx-auto text-center">
+          <h2 class="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-6">
+            <span class="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">Kontakt</span>
+          </h2>
+          <div class="glass-card text-left space-y-3 sm:space-y-4">
+            <div class="flex items-center gap-3 text-gray-300 text-sm sm:text-base">
+              <span class="text-xl sm:text-2xl">📧</span>
+              <span class="break-all">kontakt@imperium.pl</span>
+            </div>
+            <div class="flex items-center gap-3 text-gray-300 text-sm sm:text-base">
+              <span class="text-xl sm:text-2xl">💼</span>
+              <span>LinkedIn: /company/imperium-marketing</span>
+            </div>
+            <div class="flex items-center gap-3 text-gray-300 text-sm sm:text-base">
+              <span class="text-xl sm:text-2xl">📱</span>
+              <span>TikTok: @kapitankorpo</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard View (Hidden by default) -->
+  <div id="dashboardView" class="hidden min-h-screen bg-gray-50">
+    <!-- Dashboard Navbar -->
+    <nav class="bg-white border-b border-gray-200">
+      <div class="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
+        <div class="flex items-center justify-between">
+          <div class="text-xl sm:text-2xl font-black">
+            <span class="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">IMPERIUM</span>
+          </div>
+          
+          <div class="flex items-center gap-3 sm:gap-6">
+            <span class="hidden sm:inline text-gray-600 text-sm sm:text-base" id="userEmail">user@example.com</span>
+            <button onclick="logout()" class="text-gray-600 hover:text-pink-600 font-medium text-sm sm:text-base">
+              Wyloguj
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Dashboard Content -->
+    <div class="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
+      <!-- Welcome Section -->
+      <div class="mb-8 sm:mb-12">
+        <h1 class="text-3xl sm:text-4xl font-black text-gray-900 mb-2">
+          Witaj ponownie, <span class="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent" id="userName">User</span>! 👋
+        </h1>
+        <p class="text-gray-600 text-base sm:text-lg">Kontynuuj naukę i rozwijaj swoje marketingowe imperium</p>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12">
+        <div class="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-200">
+          <div class="text-xs sm:text-sm text-gray-500 mb-1">Ukończone kursy</div>
+          <div class="text-2xl sm:text-3xl font-bold text-gray-900">3</div>
+        </div>
+        
+        <div class="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-200">
+          <div class="text-xs sm:text-sm text-gray-500 mb-1">W trakcie</div>
+          <div class="text-2xl sm:text-3xl font-bold text-pink-600">2</div>
+        </div>
+        
+        <div class="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-200">
+          <div class="text-xs sm:text-sm text-gray-500 mb-1">Certyfikaty</div>
+          <div class="text-2xl sm:text-3xl font-bold text-gray-900">3</div>
+        </div>
+        
+        <div class="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-200">
+          <div class="text-xs sm:text-sm text-gray-500 mb-1">Streak</div>
+          <div class="text-xl sm:text-3xl font-bold text-purple-600">7 dni 🔥</div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="mb-6 sm:mb-8 border-b border-gray-200 overflow-x-auto">
+        <div class="flex gap-2 sm:gap-4 min-w-max sm:min-w-0">
+          <button class="tab-button active whitespace-nowrap" onclick="switchTab('courses')" id="tab-courses">
+            Moje kursy
+          </button>
+          <button class="tab-button whitespace-nowrap" onclick="switchTab('tools')" id="tab-tools">
+            Narzędzia
+          </button>
+          <button class="tab-button whitespace-nowrap" onclick="switchTab('materials')" id="tab-materials">
+            Materiały PDF
+          </button>
+        </div>
+      </div>
+
+      <!-- Courses Tab -->
+      <div id="content-courses" class="tab-content">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <!-- Course 1 -->
+          <div class="course-card bg-white">
+            <div class="mb-3">
+              <span class="badge">W trakcie</span>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Landing Page Mastery</h3>
+            <p class="text-gray-600 text-sm mb-4">Tworzenie stron które sprzedają - od psychologii do kodu</p>
+            
+            <div class="mb-3">
+              <div class="flex justify-between text-sm text-gray-500 mb-1">
+                <span>Postęp</span>
+                <span>65%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 65%"></div>
+              </div>
+            </div>
+            
+            <div class="flex justify-between items-center text-sm text-gray-500">
+              <span>12/18 lekcji</span>
+              <button class="text-pink-600 font-semibold hover:text-pink-700">Kontynuuj →</button>
+            </div>
+          </div>
+
+          <!-- Course 2 -->
+          <div class="course-card bg-white">
+            <div class="mb-3">
+              <span class="badge">W trakcie</span>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">AI Automation dla Marketingu</h3>
+            <p class="text-gray-600 text-sm mb-4">Boty, scrapers i automaty które pracują za Ciebie</p>
+            
+            <div class="mb-3">
+              <div class="flex justify-between text-sm text-gray-500 mb-1">
+                <span>Postęp</span>
+                <span>30%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 30%"></div>
+              </div>
+            </div>
+            
+            <div class="flex justify-between items-center text-sm text-gray-500">
+              <span>5/15 lekcji</span>
+              <button class="text-pink-600 font-semibold hover:text-pink-700">Kontynuuj →</button>
+            </div>
+          </div>
+
+          <!-- Course 3 -->
+          <div class="course-card bg-white">
+            <div class="mb-3">
+              <span class="badge" style="background: #10b981;">Ukończony</span>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Produkty Cyfrowe od Zera</h3>
+            <p class="text-gray-600 text-sm mb-4">Jak stworzyć i sprzedać swój pierwszy infoprodukt</p>
+            
+            <div class="mb-3">
+              <div class="flex justify-between text-sm text-gray-500 mb-1">
+                <span>Postęp</span>
+                <span>100%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 100%"></div>
+              </div>
+            </div>
+            
+            <div class="flex justify-between items-center text-sm text-gray-500">
+              <span>10/10 lekcji</span>
+              <button class="text-pink-600 font-semibold hover:text-pink-700">Certyfikat →</button>
+            </div>
+          </div>
+
+          <!-- New Course -->
+          <div class="course-card bg-white opacity-75">
+            <div class="mb-3">
+              <span class="badge" style="background: #6b7280;">Dostępne wkrótce</span>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">TikTok dla Biznesu</h3>
+            <p class="text-gray-600 text-sm mb-4">Viralowe strategie i content który sprzedaje</p>
+            
+            <div class="text-sm text-gray-500">
+              <span>Premiera: 15.03.2026</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tools Tab -->
+      <div id="content-tools" class="tab-content hidden">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:border-pink-300 transition cursor-pointer">
+            <div class="text-4xl mb-3">🤖</div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Landing Page Audytor</h3>
+            <p class="text-gray-600 text-sm mb-4">AI analizuje Twoją stronę i daje konkretne wskazówki</p>
+            <button class="text-pink-600 font-semibold hover:text-pink-700">Uruchom →</button>
+          </div>
+
+          <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:border-pink-300 transition cursor-pointer">
+            <div class="text-4xl mb-3">📊</div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">RRSO Kalkulator</h3>
+            <p class="text-gray-600 text-sm mb-4">Porównaj oferty leasingowe i znajdź najlepszą</p>
+            <button class="text-pink-600 font-semibold hover:text-pink-700">Otwórz →</button>
+          </div>
+
+          <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:border-pink-300 transition cursor-pointer">
+            <div class="text-4xl mb-3">✍️</div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Copy Generator</h3>
+            <p class="text-gray-600 text-sm mb-4">Generuj teksty sprzedażowe w 30 sekund</p>
+            <button class="text-pink-600 font-semibold hover:text-pink-700">Generuj →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Materials Tab -->
+      <div id="content-materials" class="tab-content hidden">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+          <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:border-pink-300 transition cursor-pointer">
+            <div class="flex items-start justify-between mb-3">
+              <div class="text-4xl">📄</div>
+              <span class="text-sm text-gray-500">2.3 MB</span>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Checklist: 50 punktów landing page</h3>
+            <p class="text-gray-600 text-sm mb-4">Kompletna lista sprawdzająca dla Twojej strony sprzedażowej</p>
+            <button class="text-pink-600 font-semibold hover:text-pink-700">Pobierz PDF →</button>
+          </div>
+
+          <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:border-pink-300 transition cursor-pointer">
+            <div class="flex items-start justify-between mb-3">
+              <div class="text-4xl">📊</div>
+              <span class="text-sm text-gray-500">1.8 MB</span>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Szablon strategii content</h3>
+            <p class="text-gray-600 text-sm mb-4">30-dniowy plan contentu dla social media</p>
+            <button class="text-pink-600 font-semibold hover:text-pink-700">Pobierz PDF →</button>
+          </div>
+
+          <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:border-pink-300 transition cursor-pointer">
+            <div class="flex items-start justify-between mb-3">
+              <div class="text-4xl">💰</div>
+              <span class="text-sm text-gray-500">950 KB</span>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Pricing strategies dla infoproduktów</h3>
+            <p class="text-gray-600 text-sm mb-4">Jak wycenić swoje kursy, ebooki i konsultacje</p>
+            <button class="text-pink-600 font-semibold hover:text-pink-700">Pobierz PDF →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Login Modal -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-white">Zaloguj się</h2>
+        <button onclick="closeLoginModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+      </div>
+      
+      <form onsubmit="handleLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+          <input type="email" id="loginEmail" class="input-field" placeholder="twoj@email.com" required>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-2">Hasło</label>
+          <input type="password" id="loginPassword" class="input-field" placeholder="••••••••" required>
+        </div>
+
+        <div id="loginError" class="hidden text-red-400 text-sm"></div>
+        
+        <button type="submit" class="btn-primary w-full text-white px-6 py-3 rounded-full font-bold">
+          Zaloguj się
+        </button>
+      </form>
+      
+      <p class="text-center text-gray-400 text-sm mt-6">
+        Nie masz konta? <button onclick="switchToRegister()" class="text-pink-400 hover:text-pink-300 font-semibold">Zarejestruj się</button>
+      </p>
+    </div>
+  </div>
+
+  <!-- Register Modal -->
+  <div id="registerModal" class="modal">
+    <div class="modal-content">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-white">Załóż konto</h2>
+        <button onclick="closeRegisterModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+      </div>
+      
+      <form onsubmit="handleRegister(event)" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-2">Imię</label>
+          <input type="text" id="registerName" class="input-field" placeholder="Jan Kowalski" required>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+          <input type="email" id="registerEmail" class="input-field" placeholder="twoj@email.com" required>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-2">Hasło</label>
+          <input type="password" id="registerPassword" class="input-field" placeholder="Min. 6 znaków" required minlength="6">
+        </div>
+
+        <div id="registerError" class="hidden text-red-400 text-sm"></div>
+        
+        <button type="submit" class="btn-primary w-full text-white px-6 py-3 rounded-full font-bold">
+          Stwórz konto
+        </button>
+      </form>
+      
+      <p class="text-center text-gray-400 text-sm mt-6">
+        Masz już konto? <button onclick="switchToLogin()" class="text-pink-400 hover:text-pink-300 font-semibold">Zaloguj się</button>
+      </p>
+    </div>
+  </div>
+
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    // Firebase Configuration (REPLACE WITH YOUR CONFIG)
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    // Check auth state on load
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        showDashboard(user);
+      } else {
+        showLanding();
+      }
+    });
+
+    // Modal functions
+    function openLoginModal() {
+      document.getElementById('loginModal').classList.add('active');
+    }
+
+    function closeLoginModal() {
+      document.getElementById('loginModal').classList.remove('active');
+      document.getElementById('loginError').classList.add('hidden');
+    }
+
+    function openRegisterModal() {
+      document.getElementById('registerModal').classList.add('active');
+    }
+
+    function closeRegisterModal() {
+      document.getElementById('registerModal').classList.remove('active');
+      document.getElementById('registerError').classList.add('hidden');
+    }
+
+    function switchToRegister() {
+      closeLoginModal();
+      openRegisterModal();
+    }
+
+    function switchToLogin() {
+      closeRegisterModal();
+      openLoginModal();
+    }
+
+    // Handle Login
+    async function handleLogin(e) {
+      e.preventDefault();
+      
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      const errorDiv = document.getElementById('loginError');
+
+      try {
+        await auth.signInWithEmailAndPassword(email, password);
+        closeLoginModal();
+      } catch (error) {
+        errorDiv.textContent = getErrorMessage(error.code);
+        errorDiv.classList.remove('hidden');
+      }
+    }
+
+    // Handle Register
+    async function handleRegister(e) {
+      e.preventDefault();
+      
+      const name = document.getElementById('registerName').value;
+      const email = document.getElementById('registerEmail').value;
+      const password = document.getElementById('registerPassword').value;
+      const errorDiv = document.getElementById('registerError');
+
+      try {
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        await userCredential.user.updateProfile({
+          displayName: name
+        });
+        closeRegisterModal();
+      } catch (error) {
+        errorDiv.textContent = getErrorMessage(error.code);
+        errorDiv.classList.remove('hidden');
+      }
+    }
+
+    // Logout
+    async function logout() {
+      await auth.signOut();
+      showLanding();
+    }
+
+    // Show Dashboard
+    function showDashboard(user) {
+      document.getElementById('landingView').classList.add('hidden');
+      document.getElementById('dashboardView').classList.remove('hidden');
+      
+      const displayName = user.displayName || user.email.split('@')[0];
+      document.getElementById('userName').textContent = displayName;
+      document.getElementById('userEmail').textContent = user.email;
+    }
+
+    // Show Landing
+    function showLanding() {
+      document.getElementById('landingView').classList.remove('hidden');
+      document.getElementById('dashboardView').classList.add('hidden');
+    }
+
+    // Tab switching
+    function switchTab(tabName) {
+      // Hide all content
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      // Remove active from all buttons
+      document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
+      
+      // Show selected content
+      document.getElementById(`content-${tabName}`).classList.remove('hidden');
+      // Add active to selected button
+      document.getElementById(`tab-${tabName}`).classList.add('active');
+    }
+
+    // Error messages in Polish
+    function getErrorMessage(code) {
+      const messages = {
+        'auth/email-already-in-use': 'Ten email jest już zarejestrowany',
+        'auth/invalid-email': 'Nieprawidłowy adres email',
+        'auth/user-not-found': 'Nie znaleziono użytkownika',
+        'auth/wrong-password': 'Nieprawidłowe hasło',
+        'auth/weak-password': 'Hasło jest za słabe (min. 6 znaków)',
+        'auth/too-many-requests': 'Zbyt wiele prób. Spróbuj później'
+      };
+      return messages[code] || 'Wystąpił błąd. Spróbuj ponownie';
+    }
+
+    // Smooth scroll
+    function scrollToSection(sectionId) {
+      document.getElementById(sectionId).scrollIntoView({ 
+        behavior: 'smooth' 
+      });
+    }
+
+    // Mobile menu toggle
+    function toggleMobileMenu() {
+      const mobileMenu = document.getElementById('mobileMenu');
+      mobileMenu.classList.toggle('hidden');
+    }
+
+    // Close modals on outside click
+    window.onclick = f
