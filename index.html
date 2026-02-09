@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Marketingowe Imperium - Platforma Kursów</title>
   <script src="https://cdn.tailwindcss.com"></script>
-
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
     
@@ -1199,7 +1198,7 @@
         <div class="bg-pink-900/20 border border-pink-500/30 rounded-lg p-3 text-sm">
           <div class="text-pink-300 font-semibold mb-1">🎯 Demo (testowy dostęp):</div>
           <div class="text-gray-300 text-xs">
-            Email: <code class="bg-black/30 px-1 rounded">demo@imperium.pl</code><br>
+            Email: <code class="bg-black/30 px-1 rounded"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1f7b7a72705f76726f7a6d766a72316f73">[email&#160;protected]</a></code><br>
             Hasło: <code class="bg-black/30 px-1 rounded">demo123</code>
           </div>
         </div>
@@ -1231,7 +1230,7 @@
           <div class="text-pink-300 font-semibold mb-1">🎯 Chcesz tylko przetestować?</div>
           <div class="text-gray-300 text-xs">
             Użyj demo konta bez rejestracji:<br>
-            Email: <code class="bg-black/30 px-1 rounded">demo@imperium.pl</code><br>
+            Email: <code class="bg-black/30 px-1 rounded"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="4a2e2f27250a23273a2f38233f27643a26">[email&#160;protected]</a></code><br>
             Hasło: <code class="bg-black/30 px-1 rounded">demo123</code>
           </div>
         </div>
@@ -1264,184 +1263,200 @@
     </div>
   </div>
 
- <script>
-  // Backend API URL - ZMIEŃ PO WRZUCENIU NA RAILWAY
-  const API_URL = 'marketing-empire-production.up.railway.app'; 
-  // Po deploymencie: const API_URL = 'https://TWOJA-NAZWA.up.railway.app';
 
-  // Check for stored token on page load
-  window.addEventListener('DOMContentLoaded', async () => {
-    const token = localStorage.getItem('authToken');
+  <script>
+    // UWAGA: Zmień API_URL po wrzuceniu backendu na Railway!
+    const API_URL = 'https://imperium-auth-backend-production.up.railway.app';
     
-    if (token) {
-      try {
-        const response = await fetch(`${API_URL}/api/verify`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
+    console.log('Script loaded!'); // Debug
 
-        if (response.ok) {
-          const data = await response.json();
-          showDashboard(data.user);
-        } else {
-          localStorage.removeItem('authToken');
+    // Check token on page load
+    window.addEventListener('DOMContentLoaded', async () => {
+      console.log('DOM loaded'); // Debug
+      const token = localStorage.getItem('authToken');
+      
+      if (token) {
+        try {
+          const response = await fetch(`${API_URL}/api/verify`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            showDashboard(data.user);
+          } else {
+            localStorage.removeItem('authToken');
+            showLanding();
+          }
+        } catch (error) {
+          console.error('Verify error:', error);
           showLanding();
         }
-      } catch (error) {
-        console.error('Verify error:', error);
+      } else {
         showLanding();
       }
-    } else {
+    });
+
+    // Modal functions
+    function openLoginModal() {
+      console.log('Opening login modal'); // Debug
+      document.getElementById('loginModal').classList.add('active');
+    }
+
+    function closeLoginModal() {
+      document.getElementById('loginModal').classList.remove('active');
+      document.getElementById('loginError').classList.add('hidden');
+    }
+
+    function openRegisterModal() {
+      console.log('Opening register modal'); // Debug
+      document.getElementById('registerModal').classList.add('active');
+    }
+
+    function closeRegisterModal() {
+      document.getElementById('registerModal').classList.remove('active');
+      document.getElementById('registerError').classList.add('hidden');
+    }
+
+    function switchToRegister() {
+      closeLoginModal();
+      openRegisterModal();
+    }
+
+    function switchToLogin() {
+      closeRegisterModal();
+      openLoginModal();
+    }
+
+    // Handle Login
+    async function handleLogin(e) {
+      e.preventDefault();
+      console.log('Login attempt'); // Debug
+      
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      const errorDiv = document.getElementById('loginError');
+
+      try {
+        const response = await fetch(`${API_URL}/api/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+        console.log('Login response:', data); // Debug
+
+        if (!response.ok) {
+          errorDiv.textContent = data.error || 'Błąd logowania';
+          errorDiv.classList.remove('hidden');
+          return;
+        }
+
+        localStorage.setItem('authToken', data.token);
+        showDashboard(data.user);
+        closeLoginModal();
+
+      } catch (error) {
+        console.error('Login error:', error);
+        errorDiv.textContent = 'Błąd połączenia z serwerem';
+        errorDiv.classList.remove('hidden');
+      }
+    }
+
+    // Handle Register
+    async function handleRegister(e) {
+      e.preventDefault();
+      console.log('Register attempt'); // Debug
+      
+      const name = document.getElementById('registerName').value;
+      const email = document.getElementById('registerEmail').value;
+      const password = document.getElementById('registerPassword').value;
+      const errorDiv = document.getElementById('registerError');
+
+      try {
+        const response = await fetch(`${API_URL}/api/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, name })
+        });
+
+        const data = await response.json();
+        console.log('Register response:', data); // Debug
+
+        if (!response.ok) {
+          errorDiv.textContent = data.error || 'Błąd rejestracji';
+          errorDiv.classList.remove('hidden');
+          return;
+        }
+
+        localStorage.setItem('authToken', data.token);
+        showDashboard(data.user);
+        closeRegisterModal();
+
+      } catch (error) {
+        console.error('Register error:', error);
+        errorDiv.textContent = 'Błąd połączenia z serwerem';
+        errorDiv.classList.remove('hidden');
+      }
+    }
+
+    // Logout
+    function logout() {
+      console.log('Logout'); // Debug
+      localStorage.removeItem('authToken');
       showLanding();
     }
-  });
 
-  // Modal functions
-  function openLoginModal() {
-    document.getElementById('loginModal').classList.add('active');
-  }
-
-  function closeLoginModal() {
-    document.getElementById('loginModal').classList.remove('active');
-    document.getElementById('loginError').classList.add('hidden');
-  }
-
-  function openRegisterModal() {
-    document.getElementById('registerModal').classList.add('active');
-  }
-
-  function closeRegisterModal() {
-    document.getElementById('registerModal').classList.remove('active');
-    document.getElementById('registerError').classList.add('hidden');
-  }
-
-  function switchToRegister() {
-    closeLoginModal();
-    openRegisterModal();
-  }
-
-  function switchToLogin() {
-    closeRegisterModal();
-    openLoginModal();
-  }
-
-  // Handle Login
-  async function handleLogin(e) {
-    e.preventDefault();
-    
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
-    const errorDiv = document.getElementById('loginError');
-
-    try {
-      const response = await fetch(`${API_URL}/api/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        errorDiv.textContent = data.error || 'Błąd logowania';
-        errorDiv.classList.remove('hidden');
-        return;
-      }
-
-      localStorage.setItem('authToken', data.token);
-      showDashboard(data.user);
-      closeLoginModal();
-
-    } catch (error) {
-      console.error('Login error:', error);
-      errorDiv.textContent = 'Błąd połączenia z serwerem';
-      errorDiv.classList.remove('hidden');
+    // Show Dashboard
+    function showDashboard(user) {
+      console.log('Showing dashboard for:', user); // Debug
+      document.getElementById('landingView').classList.add('hidden');
+      document.getElementById('dashboardView').classList.remove('hidden');
+      
+      const displayName = user.name || user.email.split('@')[0];
+      document.getElementById('userName').textContent = displayName;
+      document.getElementById('userEmail').textContent = user.email;
     }
-  }
 
-  // Handle Register
-  async function handleRegister(e) {
-    e.preventDefault();
-    
-    const name = document.getElementById('registerName').value;
-    const email = document.getElementById('registerEmail').value;
-    const password = document.getElementById('registerPassword').value;
-    const errorDiv = document.getElementById('registerError');
-
-    try {
-      const response = await fetch(`${API_URL}/api/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, name })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        errorDiv.textContent = data.error || 'Błąd rejestracji';
-        errorDiv.classList.remove('hidden');
-        return;
-      }
-
-      localStorage.setItem('authToken', data.token);
-      showDashboard(data.user);
-      closeRegisterModal();
-
-    } catch (error) {
-      console.error('Register error:', error);
-      errorDiv.textContent = 'Błąd połączenia z serwerem';
-      errorDiv.classList.remove('hidden');
+    // Show Landing
+    function showLanding() {
+      console.log('Showing landing'); // Debug
+      document.getElementById('landingView').classList.remove('hidden');
+      document.getElementById('dashboardView').classList.add('hidden');
     }
-  }
 
-  // Logout
-  function logout() {
-    localStorage.removeItem('authToken');
-    showLanding();
-  }
+    // Tab switching
+    function switchTab(tabName) {
+      console.log('Switching to tab:', tabName); // Debug
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
+      
+      document.getElementById(`content-${tabName}`).classList.remove('hidden');
+      document.getElementById(`tab-${tabName}`).classList.add('active');
+    }
 
-  // Show Dashboard
-  function showDashboard(user) {
-    document.getElementById('landingView').classList.add('hidden');
-    document.getElementById('dashboardView').classList.remove('hidden');
-    
-    const displayName = user.name || user.email.split('@')[0];
-    document.getElementById('userName').textContent = displayName;
-    document.getElementById('userEmail').textContent = user.email;
-  }
+    // Scroll function
+    function scrollToSection(sectionId) {
+      document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+    }
 
-  // Show Landing
-  function showLanding() {
-    document.getElementById('landingView').classList.remove('hidden');
-    document.getElementById('dashboardView').classList.add('hidden');
-  }
+    // Mobile menu
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobileMenu');
+      if (menu) menu.classList.toggle('hidden');
+    }
 
-  // Tab switching
-  function switchTab(tabName) {
-    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-    document.querySelectorAll('.tab-button').forEach(el => el.classList.remove('active'));
-    
-    document.getElementById(`content-${tabName}`).classList.remove('hidden');
-    document.getElementById(`tab-${tabName}`).classList.add('active');
-  }
+    // Close modals on outside click
+    window.onclick = function(event) {
+      const loginModal = document.getElementById('loginModal');
+      const registerModal = document.getElementById('registerModal');
+      
+      if (event.target === loginModal) closeLoginModal();
+      if (event.target === registerModal) closeRegisterModal();
+    }
 
-  // Scroll function
-  function scrollToSection(sectionId) {
-    document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
-  }
-
-  // Mobile menu
-  function toggleMobileMenu() {
-    document.getElementById('mobileMenu').classList.toggle('hidden');
-  }
-
-  // Close modals on outside click
-  window.onclick = function(event) {
-    const loginModal = document.getElementById('loginModal');
-    const registerModal = document.getElementById('registerModal');
-    
-    if (event.target === loginModal) closeLoginModal();
-    if (event.target === registerModal) closeRegisterModal();
-  }
-</script>
+    console.log('All functions loaded!'); // Debug
+  </script>
 </body>
 </html>
