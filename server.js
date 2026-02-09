@@ -3,7 +3,10 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: 'https://mattsmg.github.io',
+  credentials: true
+}));
 app.use(express.json());
 
 const JWT_SECRET = 'imperium-secret-key-2026'; // Zmień na coś bezpieczniejszego w produkcji
