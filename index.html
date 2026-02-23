@@ -1266,7 +1266,7 @@
 
   <script>
     // UWAGA: Zmień API_URL po wrzuceniu backendu na Railway!
-    const API_URL = 'https://marketing-empire-production.up.railway.app';
+    const API_URL = 'https://imperium-auth-backend-production.up.railway.app';
     
     console.log('Script loaded!'); // Debug
 
@@ -1353,9 +1353,9 @@
           return;
         }
 
-        localStorage.setItem('authToken', data.token);
-        showDashboard(data.user);
-        closeLoginModal();
+        localStorage.setItem('token', data.token);
+        // Redirect to dashboard
+        window.location.href = '/dashboard.html';
 
       } catch (error) {
         console.error('Login error:', error);
@@ -1390,9 +1390,9 @@
           return;
         }
 
-        localStorage.setItem('authToken', data.token);
-        showDashboard(data.user);
-        closeRegisterModal();
+        localStorage.setItem('token', data.token);
+        // Redirect to dashboard
+        window.location.href = '/dashboard.html';
 
       } catch (error) {
         console.error('Register error:', error);

@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Marketingowe Imperium</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --pink:   #e8287a;
+      --purple: #8b2fc9;
+      --dark:   #06060f;
+      --card:   #0d0d1a;
+    }
+
+    body {
+      background: var(--dark);
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+    }
+
+    /* NAVBAR */
+    .nav {
+      background: rgba(13,13,26,.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: .08em;
+      background: linear-gradient(130deg, var(--pink), var(--purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .nav-user {
+      font-size: .85rem;
+      color: rgba(255,255,255,.5);
+    }
+
+    .btn {
+      padding: .6rem 1.4rem;
+      border-radius: 50px;
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .22s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(130deg, var(--pink), var(--purple));
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 0 25px rgba(232,40,122,.5);
+      transform: translateY(-2px);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,.15);
+      color: rgba(255,255,255,.7);
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--pink);
+      color: #fff;
+    }
+
+    .btn-danger {
+      background: rgba(239,68,68,.15);
+      color: #ef4444;
+      border: 1px solid rgba(239,68,68,.3);
+    }
+
+    .btn-danger:hover {
+      background: rgba(239,68,68,.25);
+    }
+
+    .btn-small {
+      padding: .4rem 1rem;
+      font-size: .75rem;
+    }
+
+    /* HERO */
+    .hero {
+      padding: 3rem 2rem 2rem;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      letter-spacing: .06em;
+      margin-bottom: .8rem;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      margin-top: 1.5rem;
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-value {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.5rem;
+      background: linear-gradient(130deg, var(--pink), var(--purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stat-label {
+      font-size: .75rem;
+      text-transform: uppercase;
+      letter-spacing: .2em;
+      color: rgba(255,255,255,.4);
+    }
+
+    /* EBOOKS GRID */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      letter-spacing: .08em;
+      margin-bottom: 1.5rem;
+      color: rgba(255,255,255,.85);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.8rem;
+    }
+
+    .ebook-card {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all .25s;
+      position: relative;
+    }
+
+    .ebook-card:hover {
+      border-color: rgba(232,40,122,.4);
+      box-shadow: 0 8px 30px rgba(232,40,122,.15);
+      transform: translateY(-4px);
+    }
+
+    .ebook-card.hidden-card {
+      opacity: .5;
+    }
+
+    .ebook-cover {
+      width: 100%;
+      aspect-ratio: 3/4;
+      object-fit: cover;
+      background: linear-gradient(135deg, rgba(139,47,201,.2), rgba(232,40,122,.2));
+    }
+
+    .ebook-info {
+      padding: 1rem;
+    }
+
+    .ebook-title {
+      font-size: .95rem;
+      font-weight: 600;
+      margin-bottom: .8rem;
+      line-height: 1.4;
+      min-height: 2.8em;
+    }
+
+    .ebook-actions {
+      display: flex;
+      gap: .5rem;
+      flex-wrap: wrap;
+    }
+
+    .admin-badge {
+      position: absolute;
+      top: .6rem;
+      right: .6rem;
+      background: rgba(232,40,122,.9);
+      color: #fff;
+      font-size: .65rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: .3rem .6rem;
+      border-radius: 4px;
+    }
+
+    /* UPLOAD PLACEHOLDER (admin only) */
+    .upload-placeholder {
+      background: transparent;
+      border: 2px dashed rgba(255,255,255,.15);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      padding: 2rem 1rem;
+      cursor: pointer;
+      transition: all .25s;
+      min-height: 340px;
+    }
+
+    .upload-placeholder:hover {
+      border-color: var(--pink);
+      background: rgba(232,40,122,.05);
+    }
+
+    .upload-icon {
+      font-size: 3rem;
+      opacity: .3;
+    }
+
+    .upload-text {
+      font-size: .85rem;
+      text-transform: uppercase;
+      letter-spacing: .15em;
+      color: rgba(255,255,255,.4);
+    }
+
+    /* MODAL */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.85);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      padding: 2rem;
+      overflow-y: auto;
+    }
+
+    .modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 500px;
+      width: 100%;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      letter-spacing: .08em;
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      font-size: 1.5rem;
+      color: rgba(255,255,255,.5);
+      cursor: pointer;
+    }
+
+    .modal-close:hover {
+      color: #fff;
+    }
+
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: .85rem;
+      font-weight: 500;
+      color: rgba(255,255,255,.7);
+      margin-bottom: .5rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: .8rem 1rem;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 8px;
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: .95rem;
+      transition: all .2s;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--pink);
+      background: rgba(255,255,255,.08);
+    }
+
+    .file-input-wrapper {
+      position: relative;
+      display: block;
+      padding: 1rem;
+      background: rgba(255,255,255,.05);
+      border: 2px dashed rgba(255,255,255,.15);
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .file-input-wrapper:hover {
+      border-color: var(--pink);
+      background: rgba(232,40,122,.05);
+    }
+
+    .file-input {
+      display: none;
+    }
+
+    .file-label {
+      color: rgba(255,255,255,.5);
+      font-size: .85rem;
+    }
+
+    .file-name {
+      margin-top: .5rem;
+      color: var(--pink);
+      font-size: .8rem;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    /* LOADING */
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 3rem;
+      color: rgba(255,255,255,.5);
+    }
+
+    .loading.active {
+      display: block;
+    }
+
+    .spinner {
+      border: 3px solid rgba(255,255,255,.1);
+      border-top-color: var(--pink);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* TOAST */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.15);
+      border-radius: 12px;
+      padding: 1rem 1.5rem;
+      box-shadow: 0 8px 30px rgba(0,0,0,.4);
+      z-index: 2000;
+      display: none;
+      min-width: 300px;
+    }
+
+    .toast.active {
+      display: block;
+      animation: slideIn .3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .toast.success {
+      border-color: rgba(34,197,94,.4);
+    }
+
+    .toast.error {
+      border-color: rgba(239,68,68,.4);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="nav">
+    <div class="logo">Marketingowe Imperium</div>
+    <div class="nav-actions">
+      <span class="nav-user" id="userName"></span>
+      <button class="btn btn-ghost btn-small" onclick="logout()">Wyloguj</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <h1>Witaj, <span id="heroName"></span>!</h1>
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-value" id="ebooksCount">0</div>
+        <div class="stat-label">eBooki</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value">0</div>
+        <div class="stat-label">Kursy</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EBOOKS GRID -->
+  <main class="container">
+    <h2 class="section-title">Twoje eBooki</h2>
+    
+    <div class="loading active" id="loading">
+      <div class="spinner"></div>
+      Ładowanie ebooków...
+    </div>
+
+    <div class="grid" id="ebooksGrid"></div>
+  </main>
+
+  <!-- UPLOAD MODAL (admin only) -->
+  <div class="modal" id="uploadModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Dodaj nowy eBook</h3>
+        <button class="modal-close" onclick="closeUploadModal()">×</button>
+      </div>
+
+      <form id="uploadForm" onsubmit="handleUpload(event)">
+        <div class="form-group">
+          <label class="form-label">Tytuł</label>
+          <input type="text" class="form-input" id="ebookTitle" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Plik PDF</label>
+          <label class="file-input-wrapper">
+            <input type="file" class="file-input" id="pdfFile" accept=".pdf" required onchange="updateFileName('pdf')">
+            <span class="file-label">Kliknij aby wybrać plik PDF</span>
+            <div class="file-name" id="pdfFileName"></div>
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Okładka (PNG/JPG)</label>
+          <label class="file-input-wrapper">
+            <input type="file" class="file-input" id="coverFile" accept=".png,.jpg,.jpeg" required onchange="updateFileName('cover')">
+            <span class="file-label">Kliknij aby wybrać okładkę</span>
+            <div class="file-name" id="coverFileName"></div>
+          </label>
+        </div>
+
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-primary" style="flex: 1;">Dodaj eBook</button>
+          <button type="button" class="btn btn-ghost" onclick="closeUploadModal()">Anuluj</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const API_URL = 'http://localhost:3000'; // Zmień na Railway URL w produkcji
+    let currentUser = null;
+
+    // Check auth on load
+    window.addEventListener('DOMContentLoaded', async () => {
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        window.location.href = '/index.html';
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_URL}/api/verify`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (!res.ok) throw new Error('Auth failed');
+
+        const data = await res.json();
+        currentUser = data.user;
+
+        document.getElementById('userName').textContent = currentUser.name;
+        document.getElementById('heroName').textContent = currentUser.name.split(' ')[0];
+
+        loadEbooks();
+      } catch (error) {
+        console.error('Auth error:', error);
+        logout();
+      }
+    });
+
+    // Load ebooks
+    async function loadEbooks() {
+      const grid = document.getElementById('ebooksGrid');
+      const loading = document.getElementById('loading');
+      
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch(`${API_URL}/api/ebooks`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (!res.ok) throw new Error('Failed to load ebooks');
+
+        const ebooks = await res.json();
+        
+        loading.classList.remove('active');
+        
+        // Update count
+        document.getElementById('ebooksCount').textContent = ebooks.filter(e => !e.hidden).length;
+
+        // Render ebooks
+        grid.innerHTML = '';
+
+        // Add upload placeholder for admin
+        if (currentUser.role === 'admin') {
+          const placeholder = document.createElement('div');
+          placeholder.className = 'upload-placeholder';
+          placeholder.onclick = openUploadModal;
+          placeholder.innerHTML = `
+            <div class="upload-icon">+</div>
+            <div class="upload-text">Dodaj eBook</div>
+          `;
+          grid.appendChild(placeholder);
+        }
+
+        // Render ebook cards
+        ebooks.forEach(ebook => {
+          const card = createEbookCard(ebook);
+          grid.appendChild(card);
+        });
+
+        if (ebooks.length === 0 && currentUser.role !== 'admin') {
+          grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: rgba(255,255,255,.4); padding: 3rem;">Brak dostępnych ebooków</p>';
+        }
+      } catch (error) {
+        console.error('Load error:', error);
+        loading.innerHTML = '<p>Błąd ładowania ebooków</p>';
+      }
+    }
+
+    // Create ebook card
+    function createEbookCard(ebook) {
+      const card = document.createElement('div');
+      card.className = `ebook-card ${ebook.hidden ? 'hidden-card' : ''}`;
+      
+      const isAdmin = currentUser.role === 'admin';
+      
+      card.innerHTML = `
+        ${ebook.hidden && isAdmin ? '<div class="admin-badge">Ukryty</div>' : ''}
+        <img src="${API_URL}/uploads/ebooks/${ebook.coverPath}" alt="${ebook.title}" class="ebook-cover" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'200\\' height=\\'267\\'%3E%3Crect fill=\\'%238b2fc9\\' width=\\'200\\' height=\\'267\\'/%3E%3C/svg%3E'">
+        <div class="ebook-info">
+          <div class="ebook-title">${ebook.title}</div>
+          <div class="ebook-actions">
+            <button class="btn btn-primary btn-small" onclick="downloadEbook(${ebook.id}, '${ebook.title}')">Pobierz</button>
+            ${isAdmin ? `
+              <button class="btn btn-ghost btn-small" onclick="toggleHide(${ebook.id})">${ebook.hidden ? 'Pokaż' : 'Ukryj'}</button>
+              <button class="btn btn-danger btn-small" onclick="deleteEbook(${ebook.id})">Usuń</button>
+            ` : ''}
+          </div>
+        </div>
+      `;
+      
+      return card;
+    }
+
+    // Download ebook
+    async function downloadEbook(id, title) {
+      const token = localStorage.getItem('token');
+      window.open(`${API_URL}/api/ebooks/${id}/download?token=${token}`, '_blank');
+      showToast(`Pobieranie "${title}"...`, 'success');
+    }
+
+    // Toggle hide (admin only)
+    async function toggleHide(id) {
+      const token = localStorage.getItem('token');
+      
+      try {
+        const res = await fetch(`${API_URL}/api/ebooks/${id}/hide`, {
+          method: 'PATCH',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (!res.ok) throw new Error('Failed to toggle hide');
+
+        const data = await res.json();
+        showToast(data.message, 'success');
+        loadEbooks();
+      } catch (error) {
+        showToast('Błąd podczas zmiany widoczności', 'error');
+      }
+    }
+
+    // Delete ebook (admin only)
+    async function deleteEbook(id) {
+      if (!confirm('Czy na pewno chcesz usunąć ten eBook?')) return;
+
+      const token = localStorage.getItem('token');
+      
+      try {
+        const res = await fetch(`${API_URL}/api/ebooks/${id}`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (!res.ok) throw new Error('Failed to delete');
+
+        showToast('eBook usunięty', 'success');
+        loadEbooks();
+      } catch (error) {
+        showToast('Błąd podczas usuwania', 'error');
+      }
+    }
+
+    // Open upload modal
+    function openUploadModal() {
+      document.getElementById('uploadModal').classList.add('active');
+    }
+
+    // Close upload modal
+    function closeUploadModal() {
+      document.getElementById('uploadModal').classList.remove('active');
+      document.getElementById('uploadForm').reset();
+      document.getElementById('pdfFileName').textContent = '';
+      document.getElementById('coverFileName').textContent = '';
+    }
+
+    // Update file name display
+    function updateFileName(type) {
+      const input = document.getElementById(type + 'File');
+      const display = document.getElementById(type + 'FileName');
+      
+      if (input.files.length > 0) {
+        display.textContent = input.files[0].name;
+      } else {
+        display.textContent = '';
+      }
+    }
+
+    // Handle upload
+    async function handleUpload(e) {
+      e.preventDefault();
+      
+      const formData = new FormData();
+      formData.append('title', document.getElementById('ebookTitle').value);
+      formData.append('pdf', document.getElementById('pdfFile').files[0]);
+      formData.append('cover', document.getElementById('coverFile').files[0]);
+
+      const token = localStorage.getItem('token');
+      
+      try {
+        const res = await fetch(`${API_URL}/api/ebooks/upload`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData
+        });
+
+        if (!res.ok) {
+          const error = await res.json();
+          throw new Error(error.error);
+        }
+
+        showToast('eBook dodany pomyślnie!', 'success');
+        closeUploadModal();
+        loadEbooks();
+      } catch (error) {
+        showToast('Błąd: ' + error.message, 'error');
+      }
+    }
+
+    // Show toast
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = `toast ${type} active`;
+      
+      setTimeout(() => {
+        toast.classList.remove('active');
+      }, 3000);
+    }
+
+    // Logout
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.href = '/index.html';
+    }
+  </script>
+</body>
+</html>
