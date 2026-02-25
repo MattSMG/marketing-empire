@@ -4,930 +4,112 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard - Marketingowe Imperium</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --pink:   #e8287a;
-      --purple: #8b2fc9;
-      --dark:   #06060f;
-      --glass:  rgba(13, 13, 26, 0.6);
-      --glass-border: rgba(255, 255, 255, 0.1);
-      --glass-hover: rgba(13, 13, 26, 0.8);
-    }
-
-    body {
-      background: var(--dark);
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: Arial, sans-serif; 
+      background: #1a1a2e; 
       color: #fff;
-      font-family: 'DM Sans', sans-serif;
-      min-height: 100vh;
-      position: relative;
+      padding: 2rem;
     }
-
-    /* Animated background */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background: 
-        radial-gradient(circle at 20% 50%, rgba(232, 40, 122, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(139, 47, 201, 0.1) 0%, transparent 50%);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    /* NAVBAR */
     .nav {
-      background: rgba(13, 13, 26, 0.7);
-      backdrop-filter: blur(20px) saturate(180%);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 1rem 2rem;
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      transition: all 0.3s;
-    }
-
-    .nav.scrolled {
-      background: rgba(13, 13, 26, 0.85);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-    }
-
-    .logo {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.5rem;
-      letter-spacing: .12em;
-      background: linear-gradient(130deg, var(--pink), var(--purple));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      filter: drop-shadow(0 0 20px rgba(232, 40, 122, 0.3));
-    }
-
-    .nav-actions {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-    }
-
-    .nav-user {
-      font-size: .85rem;
-      color: rgba(255,255,255,.5);
-    }
-
-    .btn {
-      padding: .6rem 1.4rem;
-      border-radius: 12px;
-      border: none;
-      font-family: 'DM Sans', sans-serif;
-      font-size: .85rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all .25s cubic-bezier(0.4, 0, 0.2, 1);
-      letter-spacing: .04em;
-    }
-
-    .btn-primary {
-      background: linear-gradient(130deg, var(--pink), var(--purple));
-      color: #fff;
-      box-shadow: 0 4px 20px rgba(232, 40, 122, 0.3);
-    }
-
-    .btn-primary:hover {
-      box-shadow: 0 8px 30px rgba(232, 40, 122, 0.5);
-      transform: translateY(-2px);
-    }
-
-    .btn-ghost {
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      color: rgba(255, 255, 255, 0.9);
-    }
-
-    .btn-ghost:hover {
-      background: rgba(232, 40, 122, 0.15);
-      border-color: var(--pink);
-      color: #fff;
-      box-shadow: 0 0 20px rgba(232, 40, 122, 0.3);
-    }
-
-    .btn-danger {
-      background: rgba(239, 68, 68, 0.1);
-      backdrop-filter: blur(10px);
-      color: #ef4444;
-      border: 1px solid rgba(239, 68, 68, 0.3);
-    }
-
-    .btn-danger:hover {
-      background: rgba(239, 68, 68, 0.2);
-      border-color: #ef4444;
-      box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
-    }
-
-    .btn-small {
-      padding: .4rem 1rem;
-      font-size: .75rem;
-    }
-
-    /* HERO */
-    .hero {
-      padding: 3rem 2rem 2rem;
-      text-align: center;
-      position: relative;
-      z-index: 1;
-    }
-
-    .hero h1 {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(2.5rem, 6vw, 4.5rem);
-      letter-spacing: .1em;
-      margin-bottom: .8rem;
-      background: linear-gradient(130deg, #fff, rgba(255,255,255,0.7));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .hero-stats {
-      display: flex;
-      gap: 2rem;
-      justify-content: center;
-      margin-top: 1.5rem;
-    }
-
-    .stat {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 1.5rem 2rem;
-      background: var(--glass);
-      backdrop-filter: blur(20px) saturate(180%);
-      border: 1px solid var(--glass-border);
-      border-radius: 16px;
-      min-width: 140px;
-      transition: all 0.3s;
-    }
-
-    .stat:hover {
-      background: var(--glass-hover);
-      border-color: rgba(232, 40, 122, 0.3);
-      transform: translateY(-4px);
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-    }
-
-    .stat-value {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 2.8rem;
-      letter-spacing: .08em;
-      background: linear-gradient(130deg, var(--pink), var(--purple));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      filter: drop-shadow(0 0 10px rgba(232, 40, 122, 0.3));
-    }
-
-    .stat-label {
-      font-size: .75rem;
-      text-transform: uppercase;
-      letter-spacing: .2em;
-      color: rgba(255,255,255,.5);
-      font-weight: 600;
-    }
-
-    /* EBOOKS GRID */
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem;
-      position: relative;
-      z-index: 1;
-    }
-
-    .section-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 2rem;
-      letter-spacing: .12em;
-      margin-bottom: 1.5rem;
-      color: rgba(255,255,255,.9);
-      background: linear-gradient(130deg, var(--pink), var(--purple));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      filter: drop-shadow(0 0 15px rgba(232, 40, 122, 0.2));
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 1.8rem;
-    }
-
-    .ebook-card {
-      background: var(--glass);
-      backdrop-filter: blur(20px) saturate(180%);
-      border: 1px solid var(--glass-border);
-      border-radius: 16px;
-      overflow: hidden;
-      transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-    }
-
-    .ebook-card:hover {
-      background: var(--glass-hover);
-      border-color: rgba(232, 40, 122, 0.4);
-      box-shadow: 
-        0 12px 40px rgba(0, 0, 0, 0.4),
-        0 0 30px rgba(232, 40, 122, 0.2);
-      transform: translateY(-6px);
-    }
-
-    .ebook-card.hidden-card {
-      opacity: .6;
-    }
-
-    .ebook-cover {
-      width: 100%;
-      aspect-ratio: 3/4;
-      object-fit: cover;
-      background: linear-gradient(135deg, rgba(139,47,201,.2), rgba(232,40,122,.2));
-    }
-
-    .ebook-info {
       padding: 1rem;
-    }
-
-    .ebook-title {
-      font-size: .95rem;
-      font-weight: 600;
-      margin-bottom: .8rem;
-      line-height: 1.4;
-      min-height: 2.8em;
-    }
-
-    .ebook-actions {
-      display: flex;
-      gap: .5rem;
-      flex-wrap: wrap;
-    }
-
-    .admin-badge {
-      position: absolute;
-      top: .8rem;
-      right: .8rem;
-      background: linear-gradient(130deg, var(--pink), var(--purple));
-      color: #fff;
-      font-size: .65rem;
-      font-weight: 600;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      padding: .4rem .8rem;
-      border-radius: 8px;
-      z-index: 10;
-      box-shadow: 0 4px 15px rgba(232, 40, 122, 0.4);
-    }
-
-    /* UPLOAD PLACEHOLDER (admin only) */
-    .upload-placeholder {
-      background: rgba(255, 255, 255, 0.03);
-      backdrop-filter: blur(20px);
-      border: 2px dashed rgba(232, 40, 122, 0.3);
-      border-radius: 16px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-      padding: 2rem 1rem;
-      cursor: pointer;
-      transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
-      min-height: 340px;
-    }
-
-    .upload-placeholder:hover {
-      background: rgba(232, 40, 122, 0.08);
-      border-color: var(--pink);
-      box-shadow: 0 0 30px rgba(232, 40, 122, 0.2);
-      transform: translateY(-4px);
-    }
-
-    .upload-icon {
-      font-size: 3.5rem;
-      opacity: .4;
-      background: linear-gradient(130deg, var(--pink), var(--purple));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .upload-text {
-      font-size: .85rem;
-      text-transform: uppercase;
-      letter-spacing: .15em;
-      color: rgba(255,255,255,.5);
-      font-weight: 600;
-    }
-
-    /* MODAL */
-    .modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.92);
-      backdrop-filter: blur(20px);
-      z-index: 5000;
-      padding: 2rem;
-      overflow-y: auto;
-    }
-
-    .modal.active {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .modal-content {
-      background: var(--glass);
-      backdrop-filter: blur(30px) saturate(180%);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 20px;
-      padding: 2.5rem;
-      max-width: 500px;
-      width: 100%;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-      position: relative;
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      background: #16213e;
       margin-bottom: 2rem;
     }
-
-    .modal-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 2rem;
-      letter-spacing: .12em;
-      background: linear-gradient(130deg, var(--pink), var(--purple));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      filter: drop-shadow(0 0 15px rgba(232, 40, 122, 0.3));
-    }
-
-    .modal-close {
-      background: transparent;
+    .btn {
+      padding: 0.5rem 1rem;
+      background: #e94560;
+      color: #fff;
       border: none;
-      font-size: 2rem;
-      color: rgba(255,255,255,.5);
       cursor: pointer;
-      transition: all .2s;
-      line-height: 1;
+      border-radius: 4px;
     }
-
-    .modal-close:hover {
-      color: var(--pink);
-      transform: rotate(90deg);
-    }
-
-    .modal-close:hover {
-      color: #fff;
-    }
-
-    .form-group {
-      margin-bottom: 1.2rem;
-    }
-
-    .form-label {
-      display: block;
-      font-size: .8rem;
-      font-weight: 600;
-      color: rgba(255,255,255,.7);
-      margin-bottom: .5rem;
-      text-transform: uppercase;
-      letter-spacing: .12em;
-    }
-
-    .form-input {
-      width: 100%;
-      padding: .9rem 1rem;
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      color: #fff;
-      font-family: 'DM Sans', sans-serif;
-      font-size: .95rem;
-      transition: all .25s;
-    }
-
-    .form-input:focus {
-      outline: none;
-      border-color: var(--pink);
-      background: rgba(255, 255, 255, 0.08);
-      box-shadow: 0 0 20px rgba(232, 40, 122, 0.3);
-    }
-
-    .form-input::placeholder {
-      color: rgba(255,255,255,.3);
-    }
-
-    .file-input-wrapper {
-      position: relative;
-      display: block;
-      padding: 1.2rem;
-      background: rgba(255, 255, 255, 0.03);
-      backdrop-filter: blur(10px);
-      border: 2px dashed rgba(232, 40, 122, 0.3);
-      border-radius: 12px;
-      text-align: center;
-      cursor: pointer;
-      transition: all .3s;
-    }
-
-    .file-input-wrapper:hover {
-      border-color: var(--pink);
-      background: rgba(232, 40, 122, 0.08);
-      box-shadow: 0 0 20px rgba(232, 40, 122, 0.2);
-    }
-
-    .file-input {
-      display: none;
-    }
-
-    .file-label {
-      color: rgba(255,255,255,.5);
-      font-size: .85rem;
-    }
-
-    .file-name {
-      margin-top: .5rem;
-      color: var(--pink);
-      font-size: .8rem;
-    }
-
-    .modal-actions {
-      display: flex;
+    .btn:hover { background: #c23654; }
+    .hero { text-align: center; margin-bottom: 3rem; }
+    .hero h1 { font-size: 2rem; margin-bottom: 1rem; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       gap: 1rem;
-      margin-top: 2rem;
     }
-
-    /* LOADING */
-    .loading {
-      display: none;
-      text-align: center;
-      padding: 3rem;
-      color: rgba(255,255,255,.5);
+    .card {
+      background: #16213e;
+      padding: 1rem;
+      border-radius: 8px;
     }
-
-    .loading.active {
-      display: block;
-    }
-
+    .card img { width: 100%; aspect-ratio: 3/4; object-fit: cover; margin-bottom: 0.5rem; }
+    .loading { text-align: center; padding: 2rem; }
     .spinner {
-      border: 3px solid rgba(255,255,255,.1);
-      border-top-color: var(--pink);
+      border: 3px solid #333;
+      border-top-color: #e94560;
       border-radius: 50%;
       width: 40px;
       height: 40px;
       animation: spin 1s linear infinite;
-      margin: 0 auto 1rem;
+      margin: 0 auto;
     }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    /* TOAST */
-    .toast {
-      position: fixed;
-      bottom: 2rem;
-      right: 2rem;
-      background: var(--card);
-      border: 1px solid rgba(255,255,255,.15);
-      border-radius: 12px;
-      padding: 1rem 1.5rem;
-      box-shadow: 0 8px 30px rgba(0,0,0,.4);
-      z-index: 2000;
-      display: none;
-      min-width: 300px;
-    }
-
-    .toast.active {
-      display: block;
-      animation: slideIn .3s ease-out;
-    }
-
-    @keyframes slideIn {
-      from {
-        transform: translateX(400px);
-        opacity: 0;
-      }
-      to {
-        transform: translateX(0);
-        opacity: 1;
-      }
-    }
-
-    .toast.success {
-      border-color: rgba(34,197,94,.4);
-    }
-
-    .toast.error {
-      border-color: rgba(239,68,68,.4);
-    }
-
-    /* VIDEO MODAL */
-    .video-modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.95);
-      backdrop-filter: blur(20px);
-      z-index: 6000;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-    }
-
-    .video-modal.active {
-      display: flex;
-    }
-
-    .video-modal-content {
-      width: 100%;
-      max-width: 1200px;
-      position: relative;
-    }
-
-    .video-modal-close {
-      position: absolute;
-      top: -3.5rem;
-      right: 0;
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      color: rgba(255,255,255,.8);
-      font-size: 1.8rem;
-      cursor: pointer;
-      transition: all .3s;
-      z-index: 10;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .video-modal-close:hover {
-      background: var(--pink);
-      color: #fff;
-      border-color: var(--pink);
-      transform: rotate(90deg);
-      box-shadow: 0 0 25px rgba(232, 40, 122, 0.5);
-    }
-
-    .video-wrapper {
-      position: relative;
-      padding-bottom: 56.25%;
-      height: 0;
-      overflow: hidden;
-      background: #000;
-      border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
-    }
-
-    .video-wrapper iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-    }
-
-    .video-info {
-      margin-top: 2rem;
-      padding: 1.5rem;
-      background: var(--glass);
-      backdrop-filter: blur(20px) saturate(180%);
-      border: 1px solid var(--glass-border);
-      border-radius: 16px;
-    }
-
-    .video-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 2rem;
-      letter-spacing: .1em;
-      margin-bottom: .8rem;
-      background: linear-gradient(130deg, var(--pink), var(--purple));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .video-desc {
-      color: rgba(255,255,255,.6);
-      font-size: .9rem;
-      line-height: 1.6;
-    }
-      line-height: 1.6;
-    }
-
-    /* COURSE CARD */
-    .course-card {
-      background: var(--glass);
-      backdrop-filter: blur(20px) saturate(180%);
-      border: 1px solid var(--glass-border);
-      border-radius: 16px;
-      overflow: hidden;
-      transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
-      cursor: pointer;
-      position: relative;
-    }
-
-    .course-card:hover {
-      background: var(--glass-hover);
-      border-color: rgba(232, 40, 122, 0.4);
-      box-shadow: 
-        0 12px 40px rgba(0, 0, 0, 0.4),
-        0 0 30px rgba(232, 40, 122, 0.2);
-      transform: translateY(-6px);
-    }
-
-    .course-thumbnail {
-      width: 100%;
-      aspect-ratio: 16/9;
-      object-fit: cover;
-      background: linear-gradient(135deg, rgba(139,47,201,.3), rgba(232,40,122,.3));
-      position: relative;
-      border-bottom: 1px solid rgba(255,255,255,.08);
-    }
-
-    .play-overlay {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0,0,0,.4);
-      backdrop-filter: blur(2px);
-      transition: all .3s;
-    }
-
-    .course-card:hover .play-overlay {
-      background: rgba(0,0,0,.6);
-    }
-
-    .play-btn {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      background: linear-gradient(130deg, var(--pink), var(--purple));
-      border: 3px solid rgba(255,255,255,.9);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all .3s;
-      box-shadow: 0 8px 30px rgba(232, 40, 122, 0.4);
-    }
-
-    .course-card:hover .play-btn {
-      transform: scale(1.15);
-      box-shadow: 0 12px 40px rgba(232, 40, 122, 0.6);
-      border-color: #fff;
-    }
-
-    .play-icon {
-      width: 0;
-      height: 0;
-      border-left: 22px solid #fff;
-      border-top: 14px solid transparent;
-      border-bottom: 14px solid transparent;
-      margin-left: 5px;
-    }
-
-    .course-duration {
-      position: absolute;
-      bottom: .8rem;
-      right: .8rem;
-      background: rgba(0,0,0,.8);
-      backdrop-filter: blur(10px);
-      color: #fff;
-      padding: .4rem .8rem;
-      border-radius: 6px;
-      font-size: .7rem;
-      font-weight: 600;
-      border: 1px solid rgba(255,255,255,.1);
-    }
-
-    .course-info {
-      padding: 1.2rem;
-    }
-
-    .course-title {
-      font-size: .95rem;
-      font-weight: 600;
-      margin-bottom: .5rem;
-      line-height: 1.4;
-      min-height: 2.8em;
-      letter-spacing: .02em;
-    }
-
-    .course-desc {
-      font-size: .8rem;
-      color: rgba(255,255,255,.5);
-      line-height: 1.5;
-      margin-bottom: .8rem;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    .course-actions {
-      display: flex;
-      gap: .5rem;
-      flex-wrap: wrap;
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
-
-  <!-- NAVBAR -->
   <nav class="nav">
-    <div class="logo">Marketingowe Imperium</div>
-    <div class="nav-actions">
-      <span class="nav-user" id="userName"></span>
-      <button class="btn btn-ghost btn-small" onclick="logout()">Wyloguj</button>
+    <div>Dashboard</div>
+    <div>
+      <span id="userName"></span>
+      <button class="btn" onclick="logout()">Wyloguj</button>
     </div>
   </nav>
 
-  <!-- HERO -->
-  <section class="hero">
+  <div class="hero">
     <h1>Witaj, <span id="heroName"></span>!</h1>
-    <div class="hero-stats">
-      <div class="stat">
-        <div class="stat-value" id="ebooksCount">0</div>
-        <div class="stat-label">eBooki</div>
-      </div>
-      <div class="stat">
-        <div class="stat-value">0</div>
-        <div class="stat-label">Kursy</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- EBOOKS GRID -->
-  <main class="container">
-    <h2 class="section-title">Twoje eBooki</h2>
-    
-    <div class="loading active" id="loading">
-      <div class="spinner"></div>
-      Ładowanie ebooków...
-    </div>
-
-    <div class="grid" id="ebooksGrid"></div>
-
-    <!-- COURSES VIDEO SECTION -->
-    <h2 class="section-title" style="margin-top: 4rem;">Kursy Video</h2>
-    
-    <div class="loading active" id="coursesLoading">
-      <div class="spinner"></div>
-      Ładowanie kursów...
-    </div>
-
-    <div class="grid" id="coursesGrid"></div>
-  </main>
-
-  <!-- UPLOAD MODAL (admin only) -->
-  <div class="modal" id="uploadModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title">Dodaj nowy eBook</h3>
-        <button class="modal-close" onclick="closeUploadModal()">×</button>
-      </div>
-
-      <form id="uploadForm" onsubmit="handleUpload(event)">
-        <div class="form-group">
-          <label class="form-label">Tytuł</label>
-          <input type="text" class="form-input" id="ebookTitle" required>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Plik PDF</label>
-          <label class="file-input-wrapper">
-            <input type="file" class="file-input" id="pdfFile" accept=".pdf" required onchange="updateFileName('pdf')">
-            <span class="file-label">Kliknij aby wybrać plik PDF</span>
-            <div class="file-name" id="pdfFileName"></div>
-          </label>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Okładka (PNG/JPG)</label>
-          <label class="file-input-wrapper">
-            <input type="file" class="file-input" id="coverFile" accept=".png,.jpg,.jpeg" required onchange="updateFileName('cover')">
-            <span class="file-label">Kliknij aby wybrać okładkę</span>
-            <div class="file-name" id="coverFileName"></div>
-          </label>
-        </div>
-
-        <div class="modal-actions">
-          <button type="submit" class="btn btn-primary" style="flex: 1;">Dodaj eBook</button>
-          <button type="button" class="btn btn-ghost" onclick="closeUploadModal()">Anuluj</button>
-        </div>
-      </form>
-    </div>
   </div>
 
-  <!-- TOAST -->
-  <div class="toast" id="toast"></div>
-
-  <!-- VIDEO PLAYER MODAL -->
-  <div class="video-modal" id="videoModal">
-    <div class="video-modal-content">
-      <button class="video-modal-close" onclick="closeVideoModal()">×</button>
-      <div class="video-wrapper" id="videoWrapper"></div>
-      <div class="video-info">
-        <div class="video-title" id="videoTitle"></div>
-        <div class="video-desc" id="videoDesc"></div>
-      </div>
-    </div>
+  <h2>eBooki</h2>
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    Ładowanie...
   </div>
+  <div class="grid" id="ebooksGrid"></div>
 
-  <!-- UPLOAD COURSE MODAL (admin only) -->
-  <div class="modal" id="uploadCourseModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title">Dodaj nowy kurs</h3>
-        <button class="modal-close" onclick="closeUploadCourseModal()">×</button>
-      </div>
-
-      <form id="uploadCourseForm" onsubmit="handleCourseUpload(event)">
-        <div class="form-group">
-          <label class="form-label">Tytuł</label>
-          <input type="text" class="form-input" id="courseTitle" required>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Opis</label>
-          <textarea class="form-input" id="courseDesc" rows="3" style="resize: vertical;"></textarea>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">URL wideo (YouTube lub Vimeo)</label>
-          <input type="url" class="form-input" id="courseVideoUrl" required placeholder="https://youtube.com/watch?v=... lub https://vimeo.com/...">
-          <small style="color: rgba(255,255,255,.4); font-size: .75rem; display: block; margin-top: .5rem;">
-            💡 Możesz użyć unlisted video - tylko osoby z linkiem będą mogły oglądać
-          </small>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">URL miniaturki (opcjonalne)</label>
-          <input type="url" class="form-input" id="courseThumbnail" placeholder="https://... (zostaw puste dla auto-generowania)">
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Czas trwania (opcjonalne)</label>
-          <input type="text" class="form-input" id="courseDuration" placeholder="np. 45 min">
-        </div>
-
-        <div class="modal-actions">
-          <button type="submit" class="btn btn-primary" style="flex: 1;">Dodaj kurs</button>
-          <button type="button" class="btn btn-ghost" onclick="closeUploadCourseModal()">Anuluj</button>
-        </div>
-      </form>
-    </div>
+  <h2 style="margin-top: 3rem;">Kursy</h2>
+  <div class="loading" id="coursesLoading">
+    <div class="spinner"></div>
+    Ładowanie...
   </div>
+  <div class="grid" id="coursesGrid"></div>
 
   <script>
     const API_URL = 'https://empirebackend-production.up.railway.app';
     let currentUser = null;
 
-    // Check auth on load
     window.addEventListener('DOMContentLoaded', async () => {
+      console.log('DOM loaded, API_URL:', API_URL);
+      
       const token = localStorage.getItem('token');
+      console.log('Token:', token ? 'exists' : 'missing');
       
       if (!token) {
-        window.location.href = '/index.html';
+        window.location.href = './index.html';
         return;
       }
 
       try {
+        console.log('Fetching verify...');
         const res = await fetch(`${API_URL}/api/verify`, {
           headers: { Authorization: `Bearer ${token}` }
         });
+
+        console.log('Verify response:', res.status);
 
         if (!res.ok) throw new Error('Auth failed');
 
         const data = await res.json();
         currentUser = data.user;
+
+        console.log('User:', currentUser);
 
         document.getElementById('userName').textContent = currentUser.name;
         document.getElementById('heroName').textContent = currentUser.name.split(' ')[0];
@@ -936,12 +118,13 @@
         loadCourses();
       } catch (error) {
         console.error('Auth error:', error);
+        alert('Błąd autoryzacji: ' + error.message);
         logout();
       }
     });
 
-    // Load ebooks
     async function loadEbooks() {
+      console.log('Loading ebooks...');
       const grid = document.getElementById('ebooksGrid');
       const loading = document.getElementById('loading');
       
@@ -951,191 +134,34 @@
           headers: { Authorization: `Bearer ${token}` }
         });
 
-        if (!res.ok) throw new Error('Failed to load ebooks');
+        console.log('Ebooks response:', res.status);
+
+        if (!res.ok) throw new Error('Failed');
 
         const ebooks = await res.json();
+        console.log('Ebooks:', ebooks.length);
         
-        loading.classList.remove('active');
-        
-        // Update count
-        document.getElementById('ebooksCount').textContent = ebooks.filter(e => !e.hidden).length;
+        loading.style.display = 'none';
 
-        // Render ebooks
-        grid.innerHTML = '';
-
-        // Add upload placeholder for admin
-        if (currentUser.role === 'admin') {
-          const placeholder = document.createElement('div');
-          placeholder.className = 'upload-placeholder';
-          placeholder.onclick = openUploadModal;
-          placeholder.innerHTML = `
-            <div class="upload-icon">+</div>
-            <div class="upload-text">Dodaj eBook</div>
-          `;
-          grid.appendChild(placeholder);
-        }
-
-        // Render ebook cards
-        ebooks.forEach(ebook => {
-          const card = createEbookCard(ebook);
-          grid.appendChild(card);
-        });
-
-        if (ebooks.length === 0 && currentUser.role !== 'admin') {
-          grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: rgba(255,255,255,.4); padding: 3rem;">Brak dostępnych ebooków</p>';
+        if (ebooks.length === 0) {
+          grid.innerHTML = '<p>Brak ebooków</p>';
+        } else {
+          grid.innerHTML = ebooks.map(e => `
+            <div class="card">
+              <img src="${API_URL}/uploads/ebooks/${e.coverPath}" alt="${e.title}">
+              <h3>${e.title}</h3>
+              <button class="btn">Pobierz</button>
+            </div>
+          `).join('');
         }
       } catch (error) {
-        console.error('Load error:', error);
-        loading.innerHTML = '<p>Błąd ładowania ebooków</p>';
+        console.error('Load ebooks error:', error);
+        loading.innerHTML = '<p>Błąd: ' + error.message + '</p>';
       }
     }
 
-    // Create ebook card
-    function createEbookCard(ebook) {
-      const card = document.createElement('div');
-      card.className = `ebook-card ${ebook.hidden ? 'hidden-card' : ''}`;
-      
-      const isAdmin = currentUser.role === 'admin';
-      
-      card.innerHTML = `
-        ${ebook.hidden && isAdmin ? '<div class="admin-badge">Ukryty</div>' : ''}
-        <img src="${API_URL}/uploads/ebooks/${ebook.coverPath}" alt="${ebook.title}" class="ebook-cover" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'200\\' height=\\'267\\'%3E%3Crect fill=\\'%238b2fc9\\' width=\\'200\\' height=\\'267\\'/%3E%3C/svg%3E'">
-        <div class="ebook-info">
-          <div class="ebook-title">${ebook.title}</div>
-          <div class="ebook-actions">
-            <button class="btn btn-primary btn-small" onclick="downloadEbook(${ebook.id}, '${ebook.title}')">Pobierz</button>
-            ${isAdmin ? `
-              <button class="btn btn-ghost btn-small" onclick="toggleHide(${ebook.id})">${ebook.hidden ? 'Pokaż' : 'Ukryj'}</button>
-              <button class="btn btn-danger btn-small" onclick="deleteEbook(${ebook.id})">Usuń</button>
-            ` : ''}
-          </div>
-        </div>
-      `;
-      
-      return card;
-    }
-
-    // Download ebook
-    async function downloadEbook(id, title) {
-      const token = localStorage.getItem('token');
-      window.open(`${API_URL}/api/ebooks/${id}/download?token=${token}`, '_blank');
-      showToast(`Pobieranie "${title}"...`, 'success');
-    }
-
-    // Toggle hide (admin only)
-    async function toggleHide(id) {
-      const token = localStorage.getItem('token');
-      
-      try {
-        const res = await fetch(`${API_URL}/api/ebooks/${id}/hide`, {
-          method: 'PATCH',
-          headers: { Authorization: `Bearer ${token}` }
-        });
-
-        if (!res.ok) throw new Error('Failed to toggle hide');
-
-        const data = await res.json();
-        showToast(data.message, 'success');
-        loadEbooks();
-      } catch (error) {
-        showToast('Błąd podczas zmiany widoczności', 'error');
-      }
-    }
-
-    // Delete ebook (admin only)
-    async function deleteEbook(id) {
-      if (!confirm('Czy na pewno chcesz usunąć ten eBook?')) return;
-
-      const token = localStorage.getItem('token');
-      
-      try {
-        const res = await fetch(`${API_URL}/api/ebooks/${id}`, {
-          method: 'DELETE',
-          headers: { Authorization: `Bearer ${token}` }
-        });
-
-        if (!res.ok) throw new Error('Failed to delete');
-
-        showToast('eBook usunięty', 'success');
-        loadEbooks();
-      } catch (error) {
-        showToast('Błąd podczas usuwania', 'error');
-      }
-    }
-
-    // Open upload modal
-    function openUploadModal() {
-      document.getElementById('uploadModal').classList.add('active');
-    }
-
-    // Close upload modal
-    function closeUploadModal() {
-      document.getElementById('uploadModal').classList.remove('active');
-      document.getElementById('uploadForm').reset();
-      document.getElementById('pdfFileName').textContent = '';
-      document.getElementById('coverFileName').textContent = '';
-    }
-
-    // Update file name display
-    function updateFileName(type) {
-      const input = document.getElementById(type + 'File');
-      const display = document.getElementById(type + 'FileName');
-      
-      if (input.files.length > 0) {
-        display.textContent = input.files[0].name;
-      } else {
-        display.textContent = '';
-      }
-    }
-
-    // Handle upload
-    async function handleUpload(e) {
-      e.preventDefault();
-      
-      const formData = new FormData();
-      formData.append('title', document.getElementById('ebookTitle').value);
-      formData.append('pdf', document.getElementById('pdfFile').files[0]);
-      formData.append('cover', document.getElementById('coverFile').files[0]);
-
-      const token = localStorage.getItem('token');
-      
-      try {
-        const res = await fetch(`${API_URL}/api/ebooks/upload`, {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${token}` },
-          body: formData
-        });
-
-        if (!res.ok) {
-          const error = await res.json();
-          throw new Error(error.error);
-        }
-
-        showToast('eBook dodany pomyślnie!', 'success');
-        closeUploadModal();
-        loadEbooks();
-      } catch (error) {
-        showToast('Błąd: ' + error.message, 'error');
-      }
-    }
-
-    // Show toast
-    function showToast(message, type = 'success') {
-      const toast = document.getElementById('toast');
-      toast.textContent = message;
-      toast.className = `toast ${type} active`;
-      
-      setTimeout(() => {
-        toast.classList.remove('active');
-      }, 3000);
-    }
-
-    // ══════════════════════════════════════════
-    // COURSES VIDEO
-    // ══════════════════════════════════════════
-
-    // Load courses
     async function loadCourses() {
+      console.log('Loading courses...');
       const grid = document.getElementById('coursesGrid');
       const loading = document.getElementById('coursesLoading');
       
@@ -1145,220 +171,36 @@
           headers: { Authorization: `Bearer ${token}` }
         });
 
-        if (!res.ok) throw new Error('Failed to load courses');
+        console.log('Courses response:', res.status);
+
+        if (!res.ok) throw new Error('Failed');
 
         const courses = await res.json();
+        console.log('Courses:', courses.length);
         
-        loading.classList.remove('active');
+        loading.style.display = 'none';
 
-        grid.innerHTML = '';
-
-        // Add upload placeholder for admin
-        if (currentUser.role === 'admin') {
-          const placeholder = document.createElement('div');
-          placeholder.className = 'upload-placeholder';
-          placeholder.onclick = openUploadCourseModal;
-          placeholder.innerHTML = `
-            <div class="upload-icon">+</div>
-            <div class="upload-text">Dodaj kurs wideo</div>
-          `;
-          grid.appendChild(placeholder);
-        }
-
-        courses.forEach(course => {
-          const card = createCourseCard(course);
-          grid.appendChild(card);
-        });
-
-        if (courses.length === 0 && currentUser.role !== 'admin') {
-          grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: rgba(255,255,255,.4); padding: 3rem;">Brak dostępnych kursów</p>';
+        if (courses.length === 0) {
+          grid.innerHTML = '<p>Brak kursów</p>';
+        } else {
+          grid.innerHTML = courses.map(c => `
+            <div class="card">
+              <img src="${c.thumbnailUrl || ''}" alt="${c.title}">
+              <h3>${c.title}</h3>
+            </div>
+          `).join('');
         }
       } catch (error) {
         console.error('Load courses error:', error);
-        loading.innerHTML = '<p>Błąd ładowania kursów</p>';
+        loading.innerHTML = '<p>Błąd: ' + error.message + '</p>';
       }
     }
 
-    // Create course card
-    function createCourseCard(course) {
-      const card = document.createElement('div');
-      card.className = `course-card ${course.hidden ? 'hidden-card' : ''}`;
-      
-      const isAdmin = currentUser.role === 'admin';
-      const embedUrl = getEmbedUrl(course.videoUrl);
-      
-      card.innerHTML = `
-        ${course.hidden && isAdmin ? '<div class="admin-badge">Ukryty</div>' : ''}
-        <div style="position: relative;">
-          <img src="${course.thumbnailUrl || 'data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'640\\' height=\\'360\\'%3E%3Crect fill=\\'%238b2fc9\\' width=\\'640\\' height=\\'360\\'/%3E%3C/svg%3E'}" 
-               alt="${course.title}" 
-               class="course-thumbnail"
-               onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'640\\' height=\\'360\\'%3E%3Crect fill=\\'%238b2fc9\\' width=\\'640\\' height=\\'360\\'/%3E%3C/svg%3E'">
-          <div class="play-overlay" onclick="openVideoModal(${course.id}, '${embedUrl.replace(/'/g, "\\'")}', '${course.title.replace(/'/g, "\\'")}', '${(course.description || '').replace(/'/g, "\\'")}')">
-            <div class="play-btn">
-              <div class="play-icon"></div>
-            </div>
-          </div>
-          ${course.duration ? `<div class="course-duration">${course.duration}</div>` : ''}
-        </div>
-        <div class="course-info">
-          <div class="course-title">${course.title}</div>
-          ${course.description ? `<div class="course-desc">${course.description}</div>` : ''}
-          ${isAdmin ? `
-            <div class="course-actions">
-              <button class="btn btn-ghost btn-small" onclick="event.stopPropagation(); toggleHideCourse(${course.id})">${course.hidden ? 'Pokaż' : 'Ukryj'}</button>
-              <button class="btn btn-danger btn-small" onclick="event.stopPropagation(); deleteCourse(${course.id})">Usuń</button>
-            </div>
-          ` : ''}
-        </div>
-      `;
-      
-      return card;
-    }
-
-    function getEmbedUrl(url) {
-      const youtubeMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
-      if (youtubeMatch) return `https://www.youtube.com/embed/${youtubeMatch[1]}?autoplay=1`;
-      
-      const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
-      if (vimeoMatch) return `https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=1`;
-      
-      return url;
-    }
-
-    function openVideoModal(id, embedUrl, title, description) {
-      const modal = document.getElementById('videoModal');
-      const wrapper = document.getElementById('videoWrapper');
-      
-      wrapper.innerHTML = `
-        <iframe 
-          src="${embedUrl}" 
-          frameborder="0" 
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-          allowfullscreen>
-        </iframe>
-      `;
-
-      document.getElementById('videoTitle').textContent = title;
-      document.getElementById('videoDesc').textContent = description;
-
-      modal.classList.add('active');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeVideoModal() {
-      const modal = document.getElementById('videoModal');
-      document.getElementById('videoWrapper').innerHTML = '';
-      modal.classList.remove('active');
-      document.body.style.overflow = '';
-    }
-
-    function openUploadCourseModal() {
-      document.getElementById('uploadCourseModal').classList.add('active');
-    }
-
-    function closeUploadCourseModal() {
-      document.getElementById('uploadCourseModal').classList.remove('active');
-      document.getElementById('uploadCourseForm').reset();
-    }
-
-    async function handleCourseUpload(e) {
-      e.preventDefault();
-      
-      const data = {
-        title: document.getElementById('courseTitle').value,
-        description: document.getElementById('courseDesc').value,
-        videoUrl: document.getElementById('courseVideoUrl').value,
-        thumbnailUrl: document.getElementById('courseThumbnail').value,
-        duration: document.getElementById('courseDuration').value
-      };
-
-      const token = localStorage.getItem('token');
-      
-      try {
-        const res = await fetch(`${API_URL}/api/courses/add`, {
-          method: 'POST',
-          headers: { 
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(data)
-        });
-
-        if (!res.ok) {
-          const error = await res.json();
-          throw new Error(error.error);
-        }
-
-        showToast('Kurs dodany pomyślnie!', 'success');
-        closeUploadCourseModal();
-        loadCourses();
-      } catch (error) {
-        showToast('Błąd: ' + error.message, 'error');
-      }
-    }
-
-    async function toggleHideCourse(id) {
-      const token = localStorage.getItem('token');
-      
-      try {
-        const res = await fetch(`${API_URL}/api/courses/${id}/hide`, {
-          method: 'PATCH',
-          headers: { Authorization: `Bearer ${token}` }
-        });
-
-        if (!res.ok) throw new Error('Failed');
-
-        const data = await res.json();
-        showToast(data.message, 'success');
-        loadCourses();
-      } catch (error) {
-        showToast('Błąd podczas zmiany widoczności', 'error');
-      }
-    }
-
-    async function deleteCourse(id) {
-      if (!confirm('Czy na pewno chcesz usunąć ten kurs?')) return;
-
-      const token = localStorage.getItem('token');
-      
-      try {
-        const res = await fetch(`${API_URL}/api/courses/${id}`, {
-          method: 'DELETE',
-          headers: { Authorization: `Bearer ${token}` }
-        });
-
-        if (!res.ok) throw new Error('Failed');
-
-        showToast('Kurs usunięty', 'success');
-        loadCourses();
-      } catch (error) {
-        showToast('Błąd podczas usuwania', 'error');
-      }
-    }
-
-    // Logout
     function logout() {
+      console.log('Logging out...');
       localStorage.removeItem('token');
-      window.location.href = '/index.html';
+      window.location.href = './index.html';
     }
-
-    // Close modals on ESC
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        closeVideoModal();
-      }
-    });
-
-    // Navbar scroll effect
-    window.addEventListener('scroll', () => {
-      const nav = document.querySelector('.nav');
-      if (window.scrollY > 50) {
-        nav.classList.add('scrolled');
-      } else {
-        nav.classList.remove('scrolled');
-      }
-    });
   </script>
 </body>
 </html>
