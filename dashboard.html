@@ -307,7 +307,7 @@
         <div style="margin-bottom: 1.2rem;">
           <label style="display: block; font-size: .8rem; font-weight: 600; color: rgba(255,255,255,.7); margin-bottom: .5rem; text-transform: uppercase; letter-spacing: .12em;">Plik PDF</label>
           <label style="display: block; padding: 1.2rem; background: rgba(255,255,255,0.03); backdrop-filter: blur(10px); border: 2px dashed rgba(232,40,122,0.3); border-radius: 12px; text-align: center; cursor: pointer;">
-            <input type="file" id="pdfFile" accept=".pdf" required onchange="updatePdfName()" style="display: none;">
+            <input type="file" id="pdfFile" accept=".pdf" onchange="updatePdfName()" style="display: none;">
             <span style="color: rgba(255,255,255,.5); font-size: .85rem;">Kliknij aby wybrać PDF</span>
             <div id="pdfFileName" style="margin-top: .5rem; color: var(--pink); font-size: .8rem;"></div>
           </label>
@@ -315,7 +315,7 @@
         <div style="margin-bottom: 1.2rem;">
           <label style="display: block; font-size: .8rem; font-weight: 600; color: rgba(255,255,255,.7); margin-bottom: .5rem; text-transform: uppercase; letter-spacing: .12em;">Okładka (PNG/JPG)</label>
           <label style="display: block; padding: 1.2rem; background: rgba(255,255,255,0.03); backdrop-filter: blur(10px); border: 2px dashed rgba(232,40,122,0.3); border-radius: 12px; text-align: center; cursor: pointer;">
-            <input type="file" id="coverFile" accept=".png,.jpg,.jpeg" required onchange="updateCoverName()" style="display: none;">
+            <input type="file" id="coverFile" accept=".png,.jpg,.jpeg" onchange="updateCoverName()" style="display: none;">
             <span style="color: rgba(255,255,255,.5); font-size: .85rem;">Kliknij aby wybrać okładkę</span>
             <div id="coverFileName" style="margin-top: .5rem; color: var(--pink); font-size: .8rem;"></div>
           </label>
@@ -849,32 +849,56 @@
       e.preventDefault();
       console.log('[UPLOAD] Starting ebook upload...');
       
+      // Custom validation (since we removed HTML5 required)
+      const title = document.getElementById('ebookTitle').value.trim();
+      const pdfFile = document.getElementById('pdfFile').files[0];
+      const coverFile = document.getElementById('coverFile').files[0];
+      
+      if (!title) {
+        alert('Proszę podać tytuł eBooka');
+        return;
+      }
+      
+      if (!pdfFile) {
+        alert('Proszę wybrać plik PDF');
+        return;
+      }
+      
+      if (!coverFile) {
+        alert('Proszę wybrać okładkę (PNG/JPG)');
+        return;
+      }
+      
       const formData = new FormData();
-      formData.append('title', document.getElementById('ebookTitle').value);
-      formData.append('pdf', document.getElementById('pdfFile').files[0]);
-      formData.append('cover', document.getElementById('coverFile').files[0]);
+      formData.append('title', title);
+      formData.append('pdf', pdfFile);
+      formData.append('cover', coverFile);
 
       const token = localStorage.getItem('token');
       
       try {
+        console.log('[UPLOAD] Sending request to /api/ebooks/upload...');
         const res = await fetch(`${API_URL}/api/ebooks/upload`, {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
           body: formData
         });
 
+        console.log('[UPLOAD] Response status:', res.status);
+
         if (!res.ok) {
           const error = await res.json();
-          throw new Error(error.error);
+          throw new Error(error.error || 'Upload failed');
         }
 
-        console.log('[UPLOAD] eBook uploaded successfully');
-        showGlassToast('eBook dodany pomyślnie!', 'success');
+        const data = await res.json();
+        console.log('[UPLOAD] eBook uploaded successfully:', data);
+        alert('eBook dodany pomyślnie!');
         closeUploadEbookModal();
         loadEbooks();
       } catch (error) {
         console.error('[UPLOAD] Error:', error);
-        showGlassToast('Błąd: ' + error.message, 'error');
+        alert('Błąd: ' + error.message);
       }
     }
 
