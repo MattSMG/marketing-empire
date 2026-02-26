@@ -423,12 +423,13 @@
           console.log(`[EBOOKS] Rendering ebook ${i}:`, ebook.title);
           const card = document.createElement('div');
           card.className = 'card';
+          const safeTitle = ebook.title.replace(/'/g, "\\'");
           card.innerHTML = `
             <img src="${API_URL}/uploads/ebooks/${ebook.coverPath}" alt="${ebook.title}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'200\\' height=\\'267\\'%3E%3Crect fill=\\'%238b2fc9\\' width=\\'200\\' height=\\'267\\'/%3E%3C/svg%3E'">
             <div class="card-info">
               <div class="card-title">${ebook.title}</div>
               <div style="display: flex; gap: .5rem; flex-wrap: wrap;">
-                <button class="btn btn-primary btn-small" onclick="downloadEbook(${ebook.id}, '${ebook.title}')">Pobierz</button>
+                <button class="btn btn-primary btn-small" onclick="downloadEbook(${ebook.id}, '${safeTitle}')">Pobierz</button>
                 ${currentUser.role === 'admin' ? `
                   <button class="btn btn-ghost btn-small" onclick="toggleHideEbook(${ebook.id})">${ebook.hidden ? 'Pokaż' : 'Ukryj'}</button>
                   <button class="btn btn-ghost btn-small" onclick="deleteEbook(${ebook.id})" style="color: #ef4444;">Usuń</button>
