@@ -253,6 +253,79 @@
     <div class="grid" id="coursesGrid"></div>
   </main>
 
+  <!-- UPLOAD EBOOK MODAL -->
+  <div id="uploadEbookModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,.92); backdrop-filter: blur(20px); z-index: 5000; padding: 2rem; overflow-y: auto; align-items: center; justify-content: center;">
+    <div style="background: var(--glass); backdrop-filter: blur(30px) saturate(180%); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; padding: 2.5rem; max-width: 500px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.5); position: relative;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h3 style="font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: .12em; background: linear-gradient(130deg, var(--pink), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Dodaj eBook</h3>
+        <button onclick="closeUploadEbookModal()" style="background: transparent; border: none; font-size: 2rem; color: rgba(255,255,255,.5); cursor: pointer; line-height: 1;">×</button>
+      </div>
+      <form id="uploadEbookForm" onsubmit="handleEbookUpload(event)">
+        <div style="margin-bottom: 1.2rem;">
+          <label style="display: block; font-size: .8rem; font-weight: 600; color: rgba(255,255,255,.7); margin-bottom: .5rem; text-transform: uppercase; letter-spacing: .12em;">Tytuł</label>
+          <input type="text" id="ebookTitle" required style="width: 100%; padding: .9rem 1rem; background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: .95rem;">
+        </div>
+        <div style="margin-bottom: 1.2rem;">
+          <label style="display: block; font-size: .8rem; font-weight: 600; color: rgba(255,255,255,.7); margin-bottom: .5rem; text-transform: uppercase; letter-spacing: .12em;">Plik PDF</label>
+          <label style="display: block; padding: 1.2rem; background: rgba(255,255,255,0.03); backdrop-filter: blur(10px); border: 2px dashed rgba(232,40,122,0.3); border-radius: 12px; text-align: center; cursor: pointer;">
+            <input type="file" id="pdfFile" accept=".pdf" required onchange="updatePdfName()" style="display: none;">
+            <span style="color: rgba(255,255,255,.5); font-size: .85rem;">Kliknij aby wybrać PDF</span>
+            <div id="pdfFileName" style="margin-top: .5rem; color: var(--pink); font-size: .8rem;"></div>
+          </label>
+        </div>
+        <div style="margin-bottom: 1.2rem;">
+          <label style="display: block; font-size: .8rem; font-weight: 600; color: rgba(255,255,255,.7); margin-bottom: .5rem; text-transform: uppercase; letter-spacing: .12em;">Okładka (PNG/JPG)</label>
+          <label style="display: block; padding: 1.2rem; background: rgba(255,255,255,0.03); backdrop-filter: blur(10px); border: 2px dashed rgba(232,40,122,0.3); border-radius: 12px; text-align: center; cursor: pointer;">
+            <input type="file" id="coverFile" accept=".png,.jpg,.jpeg" required onchange="updateCoverName()" style="display: none;">
+            <span style="color: rgba(255,255,255,.5); font-size: .85rem;">Kliknij aby wybrać okładkę</span>
+            <div id="coverFileName" style="margin-top: .5rem; color: var(--pink); font-size: .8rem;"></div>
+          </label>
+        </div>
+        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+          <button type="submit" class="btn btn-primary" style="flex: 1;">Dodaj eBook</button>
+          <button type="button" class="btn btn-ghost" onclick="closeUploadEbookModal()">Anuluj</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- UPLOAD COURSE MODAL -->
+  <div id="uploadCourseModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,.92); backdrop-filter: blur(20px); z-index: 5000; padding: 2rem; overflow-y: auto; align-items: center; justify-content: center;">
+    <div style="background: var(--glass); backdrop-filter: blur(30px) saturate(180%); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; padding: 2.5rem; max-width: 500px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.5); position: relative;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h3 style="font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: .12em; background: linear-gradient(130deg, var(--pink), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Dodaj Kurs</h3>
+        <button onclick="closeUploadCourseModal()" style="background: transparent; border: none; font-size: 2rem; color: rgba(255,255,255,.5); cursor: pointer; line-height: 1;">×</button>
+      </div>
+      <form id="uploadCourseForm" onsubmit="handleCourseUpload(event)">
+        <div style="margin-bottom: 1.2rem;">
+          <label style="display: block; font-size: .8rem; font-weight: 600; color: rgba(255,255,255,.7); margin-bottom: .5rem; text-transform: uppercase; letter-spacing: .12em;">Tytuł</label>
+          <input type="text" id="courseTitle" required style="width: 100%; padding: .9rem 1rem; background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: .95rem;">
+        </div>
+        <div style="margin-bottom: 1.2rem;">
+          <label style="display: block; font-size: .8rem; font-weight: 600; color: rgba(255,255,255,.7); margin-bottom: .5rem; text-transform: uppercase; letter-spacing: .12em;">Opis</label>
+          <textarea id="courseDesc" rows="3" style="width: 100%; padding: .9rem 1rem; background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: .95rem; resize: vertical;"></textarea>
+        </div>
+        <div style="margin-bottom: 1.2rem;">
+          <label style="display: block; font-size: .8rem; font-weight: 600; color: rgba(255,255,255,.7); margin-bottom: .5rem; text-transform: uppercase; letter-spacing: .12em;">URL wideo</label>
+          <input type="url" id="courseVideoUrl" required placeholder="https://youtube.com/watch?v=..." style="width: 100%; padding: .9rem 1rem; background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: .95rem;">
+          <small style="color: rgba(255,255,255,.4); font-size: .75rem; display: block; margin-top: .5rem;">💡 Unlisted YouTube/Vimeo OK</small>
+        </div>
+        <div style="margin-bottom: 1.2rem;">
+          <label style="display: block; font-size: .8rem; font-weight: 600; color: rgba(255,255,255,.7); margin-bottom: .5rem; text-transform: uppercase; letter-spacing: .12em;">Thumbnail URL (opcjonalne)</label>
+          <input type="url" id="courseThumbnail" placeholder="https://... (auto z YouTube jeśli puste)" style="width: 100%; padding: .9rem 1rem; background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: .95rem;">
+        </div>
+        <div style="margin-bottom: 1.2rem;">
+          <label style="display: block; font-size: .8rem; font-weight: 600; color: rgba(255,255,255,.7); margin-bottom: .5rem; text-transform: uppercase; letter-spacing: .12em;">Czas trwania (opcjonalne)</label>
+          <input type="text" id="courseDuration" placeholder="np. 45 min" style="width: 100%; padding: .9rem 1rem; background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: .95rem;">
+        </div>
+        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+          <button type="submit" class="btn btn-primary" style="flex: 1;">Dodaj Kurs</button>
+          <button type="button" class="btn btn-ghost" onclick="closeUploadCourseModal()">Anuluj</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
     const API_URL = 'https://empirebackend-production.up.railway.app';
     let currentUser = null;
@@ -334,7 +407,7 @@
           console.log('[EBOOKS] User is admin - adding upload placeholder');
           const placeholder = document.createElement('div');
           placeholder.className = 'upload-placeholder';
-          placeholder.onclick = () => alert('Upload modal - TODO');
+          placeholder.onclick = openUploadEbookModal;
           placeholder.innerHTML = `
             <div class="upload-icon">+</div>
             <div class="upload-text">Dodaj eBook</div>
@@ -351,10 +424,16 @@
           const card = document.createElement('div');
           card.className = 'card';
           card.innerHTML = `
-            <img src="${API_URL}/uploads/ebooks/${ebook.coverPath}" alt="${ebook.title}">
+            <img src="${API_URL}/uploads/ebooks/${ebook.coverPath}" alt="${ebook.title}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'200\\' height=\\'267\\'%3E%3Crect fill=\\'%238b2fc9\\' width=\\'200\\' height=\\'267\\'/%3E%3C/svg%3E'">
             <div class="card-info">
               <div class="card-title">${ebook.title}</div>
-              <button class="btn btn-primary btn-small">Pobierz</button>
+              <div style="display: flex; gap: .5rem; flex-wrap: wrap;">
+                <button class="btn btn-primary btn-small" onclick="downloadEbook(${ebook.id}, '${ebook.title}')">Pobierz</button>
+                ${currentUser.role === 'admin' ? `
+                  <button class="btn btn-ghost btn-small" onclick="toggleHideEbook(${ebook.id})">${ebook.hidden ? 'Pokaż' : 'Ukryj'}</button>
+                  <button class="btn btn-ghost btn-small" onclick="deleteEbook(${ebook.id})" style="color: #ef4444;">Usuń</button>
+                ` : ''}
+              </div>
             </div>
           `;
           grid.appendChild(card);
@@ -404,7 +483,7 @@
           console.log('[COURSES] User is admin - adding upload placeholder');
           const placeholder = document.createElement('div');
           placeholder.className = 'upload-placeholder';
-          placeholder.onclick = () => alert('Upload course modal - TODO');
+          placeholder.onclick = openUploadCourseModal;
           placeholder.innerHTML = `
             <div class="upload-icon">+</div>
             <div class="upload-text">Dodaj kurs wideo</div>
@@ -421,9 +500,15 @@
           const card = document.createElement('div');
           card.className = 'card';
           card.innerHTML = `
-            <img src="${course.thumbnailUrl || ''}" alt="${course.title}">
+            <img src="${course.thumbnailUrl || 'data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'640\\' height=\\'360\\'%3E%3Crect fill=\\'%238b2fc9\\' width=\\'640\\' height=\\'360\\'/%3E%3C/svg%3E'}" alt="${course.title}" style="aspect-ratio: 16/9;">
             <div class="card-info">
               <div class="card-title">${course.title}</div>
+              ${currentUser.role === 'admin' ? `
+                <div style="display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .5rem;">
+                  <button class="btn btn-ghost btn-small" onclick="toggleHideCourse(${course.id})">${course.hidden ? 'Pokaż' : 'Ukryj'}</button>
+                  <button class="btn btn-ghost btn-small" onclick="deleteCourse(${course.id})" style="color: #ef4444;">Usuń</button>
+                </div>
+              ` : ''}
             </div>
           `;
           grid.appendChild(card);
@@ -438,6 +523,215 @@
       } catch (error) {
         console.error('[COURSES] Error:', error);
         loading.innerHTML = '<p>Błąd: ' + error.message + '</p>';
+      }
+    }
+
+    // Modal functions
+    function openUploadEbookModal() {
+      console.log('[MODAL] Opening ebook upload modal');
+      const modal = document.getElementById('uploadEbookModal');
+      modal.style.display = 'flex';
+    }
+
+    function closeUploadEbookModal() {
+      console.log('[MODAL] Closing ebook upload modal');
+      const modal = document.getElementById('uploadEbookModal');
+      modal.style.display = 'none';
+      document.getElementById('uploadEbookForm').reset();
+      document.getElementById('pdfFileName').textContent = '';
+      document.getElementById('coverFileName').textContent = '';
+    }
+
+    function openUploadCourseModal() {
+      console.log('[MODAL] Opening course upload modal');
+      const modal = document.getElementById('uploadCourseModal');
+      modal.style.display = 'flex';
+    }
+
+    function closeUploadCourseModal() {
+      console.log('[MODAL] Closing course upload modal');
+      const modal = document.getElementById('uploadCourseModal');
+      modal.style.display = 'none';
+      document.getElementById('uploadCourseForm').reset();
+    }
+
+    function updatePdfName() {
+      const input = document.getElementById('pdfFile');
+      const display = document.getElementById('pdfFileName');
+      if (input.files.length > 0) {
+        display.textContent = input.files[0].name;
+      }
+    }
+
+    function updateCoverName() {
+      const input = document.getElementById('coverFile');
+      const display = document.getElementById('coverFileName');
+      if (input.files.length > 0) {
+        display.textContent = input.files[0].name;
+      }
+    }
+
+    async function handleEbookUpload(e) {
+      e.preventDefault();
+      console.log('[UPLOAD] Starting ebook upload...');
+      
+      const formData = new FormData();
+      formData.append('title', document.getElementById('ebookTitle').value);
+      formData.append('pdf', document.getElementById('pdfFile').files[0]);
+      formData.append('cover', document.getElementById('coverFile').files[0]);
+
+      const token = localStorage.getItem('token');
+      
+      try {
+        const res = await fetch(`${API_URL}/api/ebooks/upload`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData
+        });
+
+        if (!res.ok) {
+          const error = await res.json();
+          throw new Error(error.error);
+        }
+
+        console.log('[UPLOAD] eBook uploaded successfully');
+        alert('eBook dodany pomyślnie!');
+        closeUploadEbookModal();
+        loadEbooks();
+      } catch (error) {
+        console.error('[UPLOAD] Error:', error);
+        alert('Błąd: ' + error.message);
+      }
+    }
+
+    async function handleCourseUpload(e) {
+      e.preventDefault();
+      console.log('[UPLOAD] Starting course upload...');
+      
+      const data = {
+        title: document.getElementById('courseTitle').value,
+        description: document.getElementById('courseDesc').value,
+        videoUrl: document.getElementById('courseVideoUrl').value,
+        thumbnailUrl: document.getElementById('courseThumbnail').value,
+        duration: document.getElementById('courseDuration').value
+      };
+
+      const token = localStorage.getItem('token');
+      
+      try {
+        const res = await fetch(`${API_URL}/api/courses/add`, {
+          method: 'POST',
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+
+        if (!res.ok) {
+          const error = await res.json();
+          throw new Error(error.error);
+        }
+
+        console.log('[UPLOAD] Course uploaded successfully');
+        alert('Kurs dodany pomyślnie!');
+        closeUploadCourseModal();
+        loadCourses();
+      } catch (error) {
+        console.error('[UPLOAD] Error:', error);
+        alert('Błąd: ' + error.message);
+      }
+    }
+
+    function downloadEbook(id, title) {
+      console.log('[DOWNLOAD] Downloading ebook:', id);
+      const token = localStorage.getItem('token');
+      window.open(`${API_URL}/api/ebooks/${id}/download?token=${token}`, '_blank');
+    }
+
+    async function toggleHideEbook(id) {
+      console.log('[ADMIN] Toggling ebook visibility:', id);
+      const token = localStorage.getItem('token');
+      
+      try {
+        const res = await fetch(`${API_URL}/api/ebooks/${id}/hide`, {
+          method: 'PATCH',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (!res.ok) throw new Error('Failed');
+
+        const data = await res.json();
+        console.log('[ADMIN] Visibility toggled:', data.message);
+        loadEbooks();
+      } catch (error) {
+        console.error('[ADMIN] Error:', error);
+        alert('Błąd podczas zmiany widoczności');
+      }
+    }
+
+    async function deleteEbook(id) {
+      if (!confirm('Czy na pewno chcesz usunąć ten eBook?')) return;
+      
+      console.log('[ADMIN] Deleting ebook:', id);
+      const token = localStorage.getItem('token');
+      
+      try {
+        const res = await fetch(`${API_URL}/api/ebooks/${id}`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (!res.ok) throw new Error('Failed');
+
+        console.log('[ADMIN] eBook deleted');
+        loadEbooks();
+      } catch (error) {
+        console.error('[ADMIN] Error:', error);
+        alert('Błąd podczas usuwania');
+      }
+    }
+
+    async function toggleHideCourse(id) {
+      console.log('[ADMIN] Toggling course visibility:', id);
+      const token = localStorage.getItem('token');
+      
+      try {
+        const res = await fetch(`${API_URL}/api/courses/${id}/hide`, {
+          method: 'PATCH',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (!res.ok) throw new Error('Failed');
+
+        const data = await res.json();
+        console.log('[ADMIN] Visibility toggled:', data.message);
+        loadCourses();
+      } catch (error) {
+        console.error('[ADMIN] Error:', error);
+        alert('Błąd podczas zmiany widoczności');
+      }
+    }
+
+    async function deleteCourse(id) {
+      if (!confirm('Czy na pewno chcesz usunąć ten kurs?')) return;
+      
+      console.log('[ADMIN] Deleting course:', id);
+      const token = localStorage.getItem('token');
+      
+      try {
+        const res = await fetch(`${API_URL}/api/courses/${id}`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (!res.ok) throw new Error('Failed');
+
+        console.log('[ADMIN] Course deleted');
+        loadCourses();
+      } catch (error) {
+        console.error('[ADMIN] Error:', error);
+        alert('Błąd podczas usuwania');
       }
     }
 
