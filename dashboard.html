@@ -235,6 +235,20 @@
 
   <section class="hero">
     <h1>Witaj, <span id="heroName"></span>!</h1>
+    <div style="display: flex; align-items: center; justify-content: center; gap: 2rem; margin-top: 2rem;">
+      <div style="text-align: center;">
+        <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255,255,255,0.5); margin-bottom: 0.5rem;">Twoje Imperium</div>
+        <div id="progress-percentage" style="font-family: 'Bebas Neue', sans-serif; font-size: 3rem; background: linear-gradient(130deg, var(--pink), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">0%</div>
+      </div>
+      <div style="position: relative; height: 150px; width: 100px;">
+        <!-- Tower segments (bottom to top) -->
+        <div id="tower-base" style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 80px; height: 30px; background: linear-gradient(135deg, rgba(232,40,122,0.6), rgba(139,47,201,0.6)); border-radius: 4px 4px 0 0; opacity: 0.1; transition: opacity 0.5s ease;"></div>
+        <div id="tower-mid" style="position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); width: 70px; height: 30px; background: linear-gradient(135deg, rgba(232,40,122,0.7), rgba(139,47,201,0.7)); border-radius: 4px 4px 0 0; opacity: 0.1; transition: opacity 0.5s ease;"></div>
+        <div id="tower-upper" style="position: absolute; bottom: 60px; left: 50%; transform: translateX(-50%); width: 60px; height: 30px; background: linear-gradient(135deg, rgba(232,40,122,0.8), rgba(139,47,201,0.8)); border-radius: 4px 4px 0 0; opacity: 0.1; transition: opacity 0.5s ease;"></div>
+        <div id="tower-neck" style="position: absolute; bottom: 90px; left: 50%; transform: translateX(-50%); width: 50px; height: 30px; background: linear-gradient(135deg, rgba(232,40,122,0.9), rgba(139,47,201,0.9)); border-radius: 4px 4px 0 0; opacity: 0.1; transition: opacity 0.5s ease;"></div>
+        <div id="tower-spire" style="position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%); width: 40px; height: 30px; background: linear-gradient(135deg, rgb(232,40,122), rgb(139,47,201)); border-radius: 20px 20px 0 0; opacity: 0.1; transition: opacity 0.5s ease;"></div>
+      </div>
+    </div>
   </section>
 
   <main class="container">
@@ -251,6 +265,31 @@
       Ładowanie kursów...
     </div>
     <div class="grid" id="coursesGrid"></div>
+
+    <!-- ADMIN PROGRESS DASHBOARD -->
+    <div id="adminProgressSection" style="display: none; margin-top: 4rem;">
+      <h2 class="section-title">Progress Uczestników</h2>
+      <div class="loading" id="loadingAdminProgress" style="display: none;">
+        <div class="spinner"></div>
+        Ładowanie danych...
+      </div>
+      <div style="background: var(--glass); backdrop-filter: blur(20px) saturate(180%); border: 1px solid var(--glass-border); border-radius: 16px; overflow: hidden;">
+        <table id="adminProgressTable" style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="background: rgba(232,40,122,0.1);">
+              <th style="padding: 1rem; text-align: left; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.7);">Uczestnik</th>
+              <th style="padding: 1rem; text-align: center; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.7);">eBooki</th>
+              <th style="padding: 1rem; text-align: center; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.7);">Kursy</th>
+              <th style="padding: 1rem; text-align: center; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.7);">Razem</th>
+              <th style="padding: 1rem; text-align: center; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.7);">Postęp</th>
+            </tr>
+          </thead>
+          <tbody id="adminProgressBody">
+            <!-- Rows populated by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
   </main>
 
   <!-- UPLOAD EBOOK MODAL -->
@@ -307,12 +346,18 @@
         </div>
         <div style="margin-bottom: 1.2rem;">
           <label style="display: block; font-size: .8rem; font-weight: 600; color: rgba(255,255,255,.7); margin-bottom: .5rem; text-transform: uppercase; letter-spacing: .12em;">URL wideo</label>
-          <input type="url" id="courseVideoUrl" required placeholder="https://youtube.com/watch?v=..." style="width: 100%; padding: .9rem 1rem; background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: .95rem;">
+          <input type="url" id="courseVideoUrl" required placeholder="https://youtube.com/watch?v=..." onchange="handleVideoUrlChange()" style="width: 100%; padding: .9rem 1rem; background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: .95rem;">
+          <div style="margin-top: .8rem;">
+            <label style="display: flex; align-items: center; gap: .5rem; cursor: pointer;">
+              <input type="checkbox" id="autoThumbnailCheck" checked onchange="handleVideoUrlChange()" style="width: 18px; height: 18px; cursor: pointer;">
+              <span style="color: rgba(255,255,255,.6); font-size: .85rem;">Pobierz miniaturkę z wideo</span>
+            </label>
+          </div>
           <small style="color: rgba(255,255,255,.4); font-size: .75rem; display: block; margin-top: .5rem;">💡 Unlisted YouTube/Vimeo OK</small>
         </div>
         <div style="margin-bottom: 1.2rem;">
           <label style="display: block; font-size: .8rem; font-weight: 600; color: rgba(255,255,255,.7); margin-bottom: .5rem; text-transform: uppercase; letter-spacing: .12em;">Thumbnail URL (opcjonalne)</label>
-          <input type="url" id="courseThumbnail" placeholder="https://... (auto z YouTube jeśli puste)" style="width: 100%; padding: .9rem 1rem; background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: .95rem;">
+          <input type="url" id="courseThumbnail" placeholder="Auto-generowane z wideo" style="width: 100%; padding: .9rem 1rem; background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: .95rem;">
         </div>
         <div style="margin-bottom: 1.2rem;">
           <label style="display: block; font-size: .8rem; font-weight: 600; color: rgba(255,255,255,.7); margin-bottom: .5rem; text-transform: uppercase; letter-spacing: .12em;">Czas trwania (opcjonalne)</label>
@@ -326,12 +371,173 @@
     </div>
   </div>
 
+  <!-- GLASS TOAST -->
+  <div id="glassToast" style="display: none; position: fixed; bottom: 2rem; right: 2rem; z-index: 6000; opacity: 0; transform: translateY(20px); transition: all 0.3s ease-out;">
+    <div style="background: var(--glass); backdrop-filter: blur(30px) saturate(180%); border: 1px solid rgba(255,255,255,0.15); border-radius: 16px; padding: 1.2rem 1.5rem; box-shadow: 0 12px 40px rgba(0,0,0,0.4); min-width: 300px; display: flex; align-items: center; gap: 1rem;">
+      <div id="toastIcon" style="font-size: 1.5rem; line-height: 1;"></div>
+      <div id="toastMessage" style="flex: 1; color: rgba(255,255,255,0.9); font-size: .9rem;"></div>
+    </div>
+  </div>
+
   <script>
     const API_URL = 'https://empirebackend-production.up.railway.app';
     let currentUser = null;
+    let userProgress = []; // Store user's progress data
 
     console.log('[INIT] Starting dashboard...');
     console.log('[INIT] API_URL:', API_URL);
+
+    // Load user progress from API
+    async function loadProgress() {
+      console.log('[PROGRESS] Loading user progress...');
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch(`${API_URL}/api/progress`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (!res.ok) throw new Error('Failed to load progress');
+
+        userProgress = await res.json();
+        console.log('[PROGRESS] Loaded:', userProgress.length, 'items');
+        
+        updateProgressBar();
+      } catch (error) {
+        console.error('[PROGRESS] Error loading progress:', error);
+      }
+    }
+
+    // Check if material is completed
+    function isCompleted(type, id) {
+      return userProgress.some(p => 
+        p.materialType === type && 
+        p.materialId === id && 
+        p.completed
+      );
+    }
+
+    // Toggle material completion
+    async function toggleCompletion(type, id) {
+      console.log(`[PROGRESS] Toggling ${type} ${id}`);
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch(`${API_URL}/api/progress/${type}/${id}`, {
+          method: 'PATCH',
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (!res.ok) throw new Error('Failed to toggle completion');
+
+        const data = await res.json();
+        console.log('[PROGRESS]', data.message);
+        
+        // Reload progress to update UI
+        await loadProgress();
+        loadEbooks(); // Refresh to show updated checkboxes
+        loadCourses();
+      } catch (error) {
+        console.error('[PROGRESS] Error:', error);
+        alert('Błąd podczas aktualizacji postępu');
+      }
+    }
+
+    // Load admin progress dashboard
+    async function loadAdminProgress() {
+      console.log('[ADMIN] Loading all users progress...');
+      const loading = document.getElementById('loadingAdminProgress');
+      const tbody = document.getElementById('adminProgressBody');
+      
+      loading.style.display = 'block';
+      
+      try {
+        const token = localStorage.getItem('token');
+        const res = await fetch(`${API_URL}/api/admin/progress`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (!res.ok) throw new Error('Failed to load admin progress');
+
+        const data = await res.json();
+        console.log('[ADMIN] Progress data:', data);
+        
+        loading.style.display = 'none';
+        
+        tbody.innerHTML = '';
+        
+        data.forEach(user => {
+          const row = document.createElement('tr');
+          row.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+          row.innerHTML = `
+            <td style="padding: 1rem;">
+              <div style="font-weight: 600;">${user.userName}</div>
+              <div style="font-size: 0.75rem; color: rgba(255,255,255,0.5);">${user.userEmail}</div>
+            </td>
+            <td style="padding: 1rem; text-align: center;">${user.ebooksCompleted}/${user.ebooksTotal}</td>
+            <td style="padding: 1rem; text-align: center;">${user.coursesCompleted}/${user.coursesTotal}</td>
+            <td style="padding: 1rem; text-align: center; font-weight: 600;">${user.totalCompleted}/${user.totalMaterials}</td>
+            <td style="padding: 1rem; text-align: center;">
+              <div style="position: relative; width: 100px; margin: 0 auto; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                <div style="position: absolute; left: 0; top: 0; height: 100%; width: ${user.completionPercentage}%; background: linear-gradient(90deg, var(--pink), var(--purple)); border-radius: 4px; transition: width 0.3s;"></div>
+              </div>
+              <div style="margin-top: 0.5rem; font-size: 0.85rem; font-weight: 600; background: linear-gradient(130deg, var(--pink), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">${user.completionPercentage}%</div>
+            </td>
+          `;
+          tbody.appendChild(row);
+        });
+        
+        if (data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" style="padding: 2rem; text-align: center; color: rgba(255,255,255,0.4);">Brak uczestników</td></tr>';
+        }
+      } catch (error) {
+        console.error('[ADMIN] Error:', error);
+        loading.style.display = 'none';
+        tbody.innerHTML = '<tr><td colspan="5" style="padding: 2rem; text-align: center; color: #ef4444;">Błąd ładowania danych</td></tr>';
+      }
+    }
+
+    // Update progress bar (tower visualization)
+    function updateProgressBar() {
+      // Get total from loaded data (call after loadEbooks/loadCourses complete)
+      const totalEbooks = document.querySelectorAll('.card').length - 2; // -2 for admin placeholders
+      const totalMaterials = Math.max(1, totalEbooks); // Avoid division by zero
+      
+      const completed = userProgress.filter(p => p.completed).length;
+      const percentage = Math.round((completed / totalMaterials) * 100);
+      
+      console.log(`[PROGRESS] ${completed}/${totalMaterials} completed (${percentage}%)`);
+      
+      // Update tower segments opacity based on percentage
+      // Each segment represents 20% (5 segments total)
+      const segments = [
+        { id: 'tower-base', threshold: 0 },    // Always visible at some level
+        { id: 'tower-mid', threshold: 20 },
+        { id: 'tower-upper', threshold: 40 },
+        { id: 'tower-neck', threshold: 60 },
+        { id: 'tower-spire', threshold: 80 }
+      ];
+      
+      segments.forEach(seg => {
+        const el = document.getElementById(seg.id);
+        if (!el) return;
+        
+        if (percentage >= seg.threshold) {
+          // Gradual opacity from threshold to threshold+20
+          const opacity = percentage >= seg.threshold + 20 
+            ? 1 
+            : 0.1 + ((percentage - seg.threshold) / 20) * 0.9;
+          el.style.opacity = opacity;
+        } else {
+          el.style.opacity = 0.1; // Barely visible
+        }
+      });
+      
+      // Update percentage text
+      const progressText = document.getElementById('progress-percentage');
+      if (progressText) {
+        progressText.textContent = `${percentage}%`;
+      }
+    }
+
 
     window.addEventListener('DOMContentLoaded', async () => {
       console.log('[DOM] DOMContentLoaded fired');
@@ -364,11 +570,21 @@
         document.getElementById('userName').textContent = currentUser.name;
         document.getElementById('heroName').textContent = currentUser.name.split(' ')[0];
 
+        console.log('[RENDER] Loading progress...');
+        await loadProgress();
+
         console.log('[RENDER] Calling loadEbooks()...');
         loadEbooks();
         
         console.log('[RENDER] Calling loadCourses()...');
         loadCourses();
+        
+        // Show admin progress dashboard if user is admin
+        if (currentUser.role === 'admin') {
+          console.log('[ADMIN] Showing admin progress section...');
+          document.getElementById('adminProgressSection').style.display = 'block';
+          loadAdminProgress();
+        }
       } catch (error) {
         console.error('[AUTH] Error:', error);
         logout();
@@ -425,8 +641,18 @@
           card.className = 'card';
           const safeTitle = ebook.title.replace(/'/g, "\\'");
           const fallbackCover = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="267"%3E%3Crect fill="%238b2fc9" width="200" height="267"/%3E%3C/svg%3E';
+          const completed = isCompleted('ebook', ebook.id);
+          
           card.innerHTML = `
-            <img src="${API_URL}/uploads/ebooks/${ebook.coverPath}" alt="${ebook.title}" onerror="this.src='${fallbackCover}'">
+            <div style="position: relative;">
+              ${currentUser.role === 'user' ? `
+                <label style="position: absolute; top: 0.5rem; left: 0.5rem; z-index: 10; cursor: pointer; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); padding: 0.5rem; border-radius: 8px; display: flex; align-items: center; gap: 0.5rem;">
+                  <input type="checkbox" ${completed ? 'checked' : ''} onchange="toggleCompletion('ebook', ${ebook.id})" style="cursor: pointer; width: 18px; height: 18px;">
+                  <span style="font-size: 0.75rem; color: #fff; font-weight: 500;">Ukończono</span>
+                </label>
+              ` : ''}
+              <img src="${API_URL}/uploads/ebooks/${ebook.coverPath}" alt="${ebook.title}" onerror="this.src='${fallbackCover}'">
+            </div>
             <div class="card-info">
               <div class="card-title">${ebook.title}</div>
               <div style="display: flex; gap: .5rem; flex-wrap: wrap;">
@@ -502,8 +728,18 @@
           const card = document.createElement('div');
           card.className = 'card';
           const fallbackThumb = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="640" height="360"%3E%3Crect fill="%238b2fc9" width="640" height="360"/%3E%3C/svg%3E';
+          const completed = isCompleted('course', course.id);
+          
           card.innerHTML = `
-            <img src="${course.thumbnailUrl || fallbackThumb}" alt="${course.title}" style="aspect-ratio: 16/9;">
+            <div style="position: relative;">
+              ${currentUser.role === 'user' ? `
+                <label style="position: absolute; top: 0.5rem; left: 0.5rem; z-index: 10; cursor: pointer; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); padding: 0.5rem; border-radius: 8px; display: flex; align-items: center; gap: 0.5rem;">
+                  <input type="checkbox" ${completed ? 'checked' : ''} onchange="toggleCompletion('course', ${course.id})" style="cursor: pointer; width: 18px; height: 18px;">
+                  <span style="font-size: 0.75rem; color: #fff; font-weight: 500;">Ukończono</span>
+                </label>
+              ` : ''}
+              <img src="${course.thumbnailUrl || fallbackThumb}" alt="${course.title}" style="aspect-ratio: 16/9;">
+            </div>
             <div class="card-info">
               <div class="card-title">${course.title}</div>
               ${currentUser.role === 'admin' ? `
@@ -558,6 +794,41 @@
       document.getElementById('uploadCourseForm').reset();
     }
 
+    function handleVideoUrlChange() {
+      const videoUrl = document.getElementById('courseVideoUrl').value;
+      const autoCheck = document.getElementById('autoThumbnailCheck').checked;
+      const thumbnailInput = document.getElementById('courseThumbnail');
+
+      if (!autoCheck || !videoUrl) {
+        return;
+      }
+
+      console.log('[AUTO-THUMB] Generating thumbnail for:', videoUrl);
+
+      // YouTube regex
+      const youtubeMatch = videoUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+      if (youtubeMatch) {
+        const videoId = youtubeMatch[1];
+        const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+        thumbnailInput.value = thumbnailUrl;
+        console.log('[AUTO-THUMB] YouTube thumbnail generated:', thumbnailUrl);
+        return;
+      }
+
+      // Vimeo regex
+      const vimeoMatch = videoUrl.match(/vimeo\.com\/(\d+)/);
+      if (vimeoMatch) {
+        const videoId = vimeoMatch[1];
+        // Vimeo thumbnail service (vumbnail.com provides Vimeo thumbnails without API)
+        const thumbnailUrl = `https://vumbnail.com/${videoId}.jpg`;
+        thumbnailInput.value = thumbnailUrl;
+        console.log('[AUTO-THUMB] Vimeo thumbnail generated:', thumbnailUrl);
+        return;
+      }
+
+      console.log('[AUTO-THUMB] No video ID found');
+    }
+
     function updatePdfName() {
       const input = document.getElementById('pdfFile');
       const display = document.getElementById('pdfFileName');
@@ -598,12 +869,12 @@
         }
 
         console.log('[UPLOAD] eBook uploaded successfully');
-        alert('eBook dodany pomyślnie!');
+        showGlassToast('eBook dodany pomyślnie!', 'success');
         closeUploadEbookModal();
         loadEbooks();
       } catch (error) {
         console.error('[UPLOAD] Error:', error);
-        alert('Błąd: ' + error.message);
+        showGlassToast('Błąd: ' + error.message, 'error');
       }
     }
 
@@ -637,12 +908,12 @@
         }
 
         console.log('[UPLOAD] Course uploaded successfully');
-        alert('Kurs dodany pomyślnie!');
+        showGlassToast('Kurs dodany pomyślnie!', 'success');
         closeUploadCourseModal();
         loadCourses();
       } catch (error) {
         console.error('[UPLOAD] Error:', error);
-        alert('Błąd: ' + error.message);
+        showGlassToast('Błąd: ' + error.message, 'error');
       }
     }
 
@@ -669,7 +940,7 @@
         loadEbooks();
       } catch (error) {
         console.error('[ADMIN] Error:', error);
-        alert('Błąd podczas zmiany widoczności');
+        showGlassToast('Błąd podczas zmiany widoczności', 'error');
       }
     }
 
@@ -691,7 +962,7 @@
         loadEbooks();
       } catch (error) {
         console.error('[ADMIN] Error:', error);
-        alert('Błąd podczas usuwania');
+        showGlassToast('Błąd podczas usuwania', 'error');
       }
     }
 
@@ -712,7 +983,7 @@
         loadCourses();
       } catch (error) {
         console.error('[ADMIN] Error:', error);
-        alert('Błąd podczas zmiany widoczności');
+        showGlassToast('Błąd podczas zmiany widoczności', 'error');
       }
     }
 
@@ -734,8 +1005,41 @@
         loadCourses();
       } catch (error) {
         console.error('[ADMIN] Error:', error);
-        alert('Błąd podczas usuwania');
+        showGlassToast('Błąd podczas usuwania', 'error');
       }
+    }
+
+    function showGlassToast(message, type = 'success') {
+      const toast = document.getElementById('glassToast');
+      const icon = document.getElementById('toastIcon');
+      const msg = document.getElementById('toastMessage');
+
+      // Set icon based on type
+      if (type === 'success') {
+        icon.textContent = '✓';
+        icon.style.color = '#10b981';
+      } else {
+        icon.textContent = '✗';
+        icon.style.color = '#ef4444';
+      }
+
+      msg.textContent = message;
+      toast.style.display = 'block';
+
+      // Fade in
+      setTimeout(() => {
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateY(0)';
+      }, 10);
+
+      // Auto-hide after 3s
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+          toast.style.display = 'none';
+        }, 300);
+      }, 3000);
     }
 
     function logout() {
