@@ -371,6 +371,19 @@
     </div>
   </div>
 
+  <!-- VIDEO PLAYER MODAL -->
+  <div id="videoModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(30px); z-index: 6000; padding: 2rem; align-items: center; justify-content: center;" onclick="closeVideoModal()">
+    <div style="position: relative; max-width: 1200px; width: 100%; background: var(--glass); backdrop-filter: blur(30px) saturate(180%); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.6);" onclick="event.stopPropagation()">
+      <button onclick="closeVideoModal()" style="position: absolute; top: 1rem; right: 1rem; z-index: 10; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); border: none; width: 40px; height: 40px; border-radius: 50%; color: #fff; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">×</button>
+      <div id="videoContainer" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+        <!-- Video iframe will be injected here -->
+      </div>
+      <div style="padding: 1.5rem; background: rgba(0,0,0,0.3);">
+        <h3 id="videoTitle" style="font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; letter-spacing: 0.08em; margin: 0; background: linear-gradient(130deg, var(--pink), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"></h3>
+      </div>
+    </div>
+  </div>
+
   <!-- GLASS TOAST -->
   <div id="glassToast" style="display: none; position: fixed; bottom: 2rem; right: 2rem; z-index: 6000; opacity: 0; transform: translateY(20px); transition: all 0.3s ease-out;">
     <div style="background: var(--glass); backdrop-filter: blur(30px) saturate(180%); border: 1px solid rgba(255,255,255,0.15); border-radius: 16px; padding: 1.2rem 1.5rem; box-shadow: 0 12px 40px rgba(0,0,0,0.4); min-width: 300px; display: flex; align-items: center; gap: 1rem;">
@@ -497,14 +510,21 @@
 
     // Update progress bar (tower visualization)
     function updateProgressBar() {
-      // Get total from loaded data (call after loadEbooks/loadCourses complete)
-      const totalEbooks = document.querySelectorAll('.card').length - 2; // -2 for admin placeholders
-      const totalMaterials = Math.max(1, totalEbooks); // Avoid division by zero
+      // Calculate total from global variables set by loadEbooks/loadCourses
+      // Use window variables to access from this scope
+      const totalEbooks = window.totalEbooksCount || 0;
+      const totalCourses = window.totalCoursesCount || 0;
+      const totalMaterials = totalEbooks + totalCourses;
+      
+      if (totalMaterials === 0) {
+        console.log('[PROGRESS] No materials yet, skipping update');
+        return;
+      }
       
       const completed = userProgress.filter(p => p.completed).length;
       const percentage = Math.round((completed / totalMaterials) * 100);
       
-      console.log(`[PROGRESS] ${completed}/${totalMaterials} completed (${percentage}%)`);
+      console.log(`[PROGRESS] ${completed}/${totalMaterials} completed (${percentage}%) [ebooks: ${totalEbooks}, courses: ${totalCourses}]`);
       
       // Update tower segments opacity based on percentage
       // Each segment represents 20% (5 segments total)
@@ -611,6 +631,9 @@
         const ebooks = await res.json();
         console.log('[EBOOKS] Data received:', ebooks.length, 'ebooks');
         
+        // Store count globally for progress calculation
+        window.totalEbooksCount = ebooks.length;
+        
         loading.classList.remove('active');
         console.log('[EBOOKS] Spinner hidden');
 
@@ -644,18 +667,16 @@
           const completed = isCompleted('ebook', ebook.id);
           
           card.innerHTML = `
-            <div style="position: relative;">
+            <img src="${API_URL}/uploads/ebooks/${ebook.coverPath}" alt="${ebook.title}" onerror="this.src='${fallbackCover}'">
+            <div class="card-info">
               ${currentUser.role === 'user' ? `
-                <label style="position: absolute; top: 0.5rem; left: 0.5rem; z-index: 10; cursor: pointer; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); padding: 0.5rem; border-radius: 8px; display: flex; align-items: center; gap: 0.5rem;">
-                  <input type="checkbox" ${completed ? 'checked' : ''} onchange="toggleCompletion('ebook', ${ebook.id})" style="cursor: pointer; width: 18px; height: 18px;">
-                  <span style="font-size: 0.75rem; color: #fff; font-weight: 500;">Ukończono</span>
+                <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.8rem; cursor: pointer; padding: 0.5rem; background: rgba(255,255,255,0.03); border-radius: 8px; transition: background 0.2s;">
+                  <input type="checkbox" ${completed ? 'checked' : ''} onchange="toggleCompletion('ebook', ${ebook.id})" style="cursor: pointer; width: 18px; height: 18px; accent-color: var(--pink);">
+                  <span style="font-size: 0.85rem; color: rgba(255,255,255,0.8);">Ukończono</span>
                 </label>
               ` : ''}
-              <img src="${API_URL}/uploads/ebooks/${ebook.coverPath}" alt="${ebook.title}" onerror="this.src='${fallbackCover}'">
-            </div>
-            <div class="card-info">
               <div class="card-title">${ebook.title}</div>
-              <div style="display: flex; gap: .5rem; flex-wrap: wrap;">
+              <div style="display: flex; gap: .5rem; flex-wrap: wrap; margin-top: 0.5rem;">
                 <button class="btn btn-primary btn-small" onclick="downloadEbook(${ebook.id}, '${safeTitle}')">Pobierz</button>
                 ${currentUser.role === 'admin' ? `
                   <button class="btn btn-ghost btn-small" onclick="toggleHideEbook(${ebook.id})">${ebook.hidden ? 'Pokaż' : 'Ukryj'}</button>
@@ -699,6 +720,9 @@
         const courses = await res.json();
         console.log('[COURSES] Data received:', courses.length, 'courses');
         
+        // Store count globally for progress calculation
+        window.totalCoursesCount = courses.length;
+        
         loading.classList.remove('active');
         console.log('[COURSES] Spinner hidden');
 
@@ -731,16 +755,19 @@
           const completed = isCompleted('course', course.id);
           
           card.innerHTML = `
-            <div style="position: relative;">
-              ${currentUser.role === 'user' ? `
-                <label style="position: absolute; top: 0.5rem; left: 0.5rem; z-index: 10; cursor: pointer; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); padding: 0.5rem; border-radius: 8px; display: flex; align-items: center; gap: 0.5rem;">
-                  <input type="checkbox" ${completed ? 'checked' : ''} onchange="toggleCompletion('course', ${course.id})" style="cursor: pointer; width: 18px; height: 18px;">
-                  <span style="font-size: 0.75rem; color: #fff; font-weight: 500;">Ukończono</span>
-                </label>
-              ` : ''}
+            <div class="video-thumbnail" data-video-url="${course.videoUrl}" data-video-title="${course.title}" style="position: relative; cursor: pointer;">
               <img src="${course.thumbnailUrl || fallbackThumb}" alt="${course.title}" style="aspect-ratio: 16/9;">
+              <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: linear-gradient(135deg, var(--pink), var(--purple)); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(232,40,122,0.4); transition: transform 0.2s;">
+                <div style="width: 0; height: 0; border-left: 20px solid white; border-top: 12px solid transparent; border-bottom: 12px solid transparent; margin-left: 4px;"></div>
+              </div>
             </div>
             <div class="card-info">
+              ${currentUser.role === 'user' ? `
+                <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.8rem; cursor: pointer; padding: 0.5rem; background: rgba(255,255,255,0.03); border-radius: 8px; transition: background 0.2s;">
+                  <input type="checkbox" ${completed ? 'checked' : ''} onchange="toggleCompletion('course', ${course.id})" style="cursor: pointer; width: 18px; height: 18px; accent-color: var(--pink);">
+                  <span style="font-size: 0.85rem; color: rgba(255,255,255,0.8);">Ukończono</span>
+                </label>
+              ` : ''}
               <div class="card-title">${course.title}</div>
               ${currentUser.role === 'admin' ? `
                 <div style="display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .5rem;">
@@ -750,7 +777,14 @@
               ` : ''}
             </div>
           `;
+          
           grid.appendChild(card);
+          
+          // Add click listener to video thumbnail (safer than inline onclick)
+          const thumbnail = card.querySelector('.video-thumbnail');
+          thumbnail.addEventListener('click', () => {
+            openVideoModal(course.videoUrl, course.title);
+          });
         });
 
         if (courses.length === 0 && currentUser.role !== 'admin') {
@@ -1064,6 +1098,59 @@
           toast.style.display = 'none';
         }, 300);
       }, 3000);
+    }
+
+    // Video modal functions
+    function openVideoModal(videoUrl, title) {
+      console.log('[VIDEO] Opening video:', title);
+      const modal = document.getElementById('videoModal');
+      const container = document.getElementById('videoContainer');
+      const titleEl = document.getElementById('videoTitle');
+      
+      // Extract video ID and create embed URL
+      let embedUrl = '';
+      
+      // YouTube
+      const youtubeMatch = videoUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+      if (youtubeMatch) {
+        embedUrl = `https://www.youtube.com/embed/${youtubeMatch[1]}?autoplay=1&rel=0`;
+      }
+      
+      // Vimeo
+      const vimeoMatch = videoUrl.match(/vimeo\.com\/(\d+)/);
+      if (vimeoMatch) {
+        embedUrl = `https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=1`;
+      }
+      
+      // Fallback - direct link
+      if (!embedUrl) {
+        embedUrl = videoUrl;
+      }
+      
+      container.innerHTML = `<iframe src="${embedUrl}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+      titleEl.textContent = title;
+      
+      modal.style.display = 'flex';
+      
+      // ESC to close
+      document.addEventListener('keydown', handleVideoEsc);
+    }
+
+    function closeVideoModal() {
+      console.log('[VIDEO] Closing video modal');
+      const modal = document.getElementById('videoModal');
+      const container = document.getElementById('videoContainer');
+      
+      modal.style.display = 'none';
+      container.innerHTML = ''; // Stop video playback
+      
+      document.removeEventListener('keydown', handleVideoEsc);
+    }
+
+    function handleVideoEsc(e) {
+      if (e.key === 'Escape') {
+        closeVideoModal();
+      }
     }
 
     function logout() {
