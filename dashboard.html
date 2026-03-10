@@ -423,8 +423,8 @@
     // Check if material is completed
     function isCompleted(type, id) {
       return userProgress.some(p => 
-        p.materialType === type && 
-        p.materialId === id && 
+        p.material_Type === type && 
+        p.material_Id === id && 
         p.completed
       );
     }
@@ -667,7 +667,7 @@
           const completed = isCompleted('ebook', ebook.id);
           
           card.innerHTML = `
-            <img src="${API_URL}/uploads/ebooks/${ebook.coverPath}" alt="${ebook.title}" onerror="this.src='${fallbackCover}'">
+            <img src="${API_URL}/uploads/ebooks/${ebook.cover_Path}" alt="${ebook.title}" onerror="this.src='${fallbackCover}'">
             <div class="card-info">
               ${currentUser.role === 'user' ? `
                 <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.8rem; cursor: pointer; padding: 0.5rem; background: rgba(255,255,255,0.03); border-radius: 8px; transition: background 0.2s;">
@@ -755,8 +755,8 @@
           const completed = isCompleted('course', course.id);
           
           card.innerHTML = `
-            <div class="video-thumbnail" data-video-url="${course.videoUrl}" data-video-title="${course.title}" style="position: relative; cursor: pointer;">
-              <img src="${course.thumbnailUrl || fallbackThumb}" alt="${course.title}" style="aspect-ratio: 16/9;">
+            <div class="video-thumbnail" data-video-url="${course.video_Url}" data-video-title="${course.title}" style="position: relative; cursor: pointer;">
+              <img src="${course.thumbnail_Url || fallbackThumb}" alt="${course.title}" style="aspect-ratio: 16/9;">
               <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: linear-gradient(135deg, var(--pink), var(--purple)); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(232,40,122,0.4); transition: transform 0.2s;">
                 <div style="width: 0; height: 0; border-left: 20px solid white; border-top: 12px solid transparent; border-bottom: 12px solid transparent; margin-left: 4px;"></div>
               </div>
@@ -783,7 +783,7 @@
           // Add click listener to video thumbnail (safer than inline onclick)
           const thumbnail = card.querySelector('.video-thumbnail');
           thumbnail.addEventListener('click', () => {
-            openVideoModal(course.videoUrl, course.title);
+            openVideoModal(course.video_Url, course.title);
           });
         });
 
