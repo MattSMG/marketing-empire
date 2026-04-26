@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Scroll Demo – Imperium</title>
+  <title>Marketingowe Imperium | Kurs marketingu cyfrowego | AI |</title>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -359,6 +359,33 @@
     .arr { color: var(--pink); animation: arr 1.5s ease-in-out infinite; }
     @keyframes arr { 0%,100%{transform:translateY(0)} 50%{transform:translateY(5px)} }
 
+    /* TOP NAV */
+    .top-nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      display: flex; justify-content: flex-end; align-items: center;
+      padding: 18px 28px;
+      z-index: 1000;
+      pointer-events: none;
+    }
+    .nav-login-btn {
+      pointer-events: all;
+      background: transparent;
+      border: 1.5px solid var(--pink);
+      color: #fff;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      letter-spacing: .12em;
+      padding: 8px 22px;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: background .25s, box-shadow .25s;
+    }
+    .nav-login-btn:hover {
+      background: linear-gradient(130deg, var(--pink), var(--purple));
+      border-color: transparent;
+      box-shadow: 0 0 18px rgba(232,40,122,.4);
+    }
+
     /* CONTENT AFTER HERO */
     .after {
       padding: 140px 24px 160px;
@@ -526,6 +553,10 @@
   </style>
 </head>
 <body>
+
+<nav class="top-nav">
+  <button class="nav-login-btn" onclick="openLoginModal()">ZALOGUJ</button>
+</nav>
 
 <div class="scene" id="scene">
   <div class="sticky">
