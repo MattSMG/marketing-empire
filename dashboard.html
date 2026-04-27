@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Marketingowe Imperium - Twoja Platforma</title>
+  <title>Marketingowe Imperium - Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -14,112 +15,392 @@
       --glass:  rgba(13, 13, 26, 0.6);
       --glass-border: rgba(255, 255, 255, 0.1);
     }
-    body { background: var(--dark); color: #fff; font-family: 'DM Sans', sans-serif; min-height: 100vh; position: relative; }
+    body { background: var(--dark); color: #fff; font-family: 'DM Sans', sans-serif; min-height: 100vh; }
     body::before {
       content: ''; position: fixed; inset: 0;
-      background: radial-gradient(circle at 20% 50%, rgba(232, 40, 122, 0.1) 0%, transparent 50%),
-                  radial-gradient(circle at 80% 80%, rgba(139, 47, 201, 0.1) 0%, transparent 50%);
+      background: radial-gradient(circle at 20% 50%, rgba(232, 40, 122, 0.08) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 80%, rgba(139, 47, 201, 0.08) 0%, transparent 50%);
       pointer-events: none; z-index: 0;
     }
-    .nav {
-      background: rgba(13, 13, 26, 0.7); backdrop-filter: blur(20px) saturate(180%);
-      border-bottom: 1px solid rgba(255,255,255,0.08); padding: 1rem 2rem;
-      display: flex; justify-content: space-between; align-items: center;
-      position: sticky; top: 0; z-index: 100;
+
+    /* ── SIDEBAR ─────────────────────────────────────────── */
+    .sidebar {
+      position: fixed; left: 0; top: 0; width: 240px; height: 100vh;
+      background: rgba(8, 8, 18, 0.97); backdrop-filter: blur(20px);
+      border-right: 1px solid var(--glass-border);
+      display: flex; flex-direction: column; z-index: 1000;
+      transition: transform 0.3s ease;
     }
-    .logo {
-      font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; letter-spacing: .12em;
+    .sidebar.collapsed { transform: translateX(-240px); }
+    .sidebar-header {
+      padding: 1.25rem 1rem; border-bottom: 1px solid var(--glass-border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .sidebar-logo {
+      font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: .1em;
       background: linear-gradient(130deg, var(--pink), var(--purple));
       -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-      filter: drop-shadow(0 0 20px rgba(232, 40, 122, 0.3));
     }
-    .btn { padding: .6rem 1.4rem; border-radius: 12px; border: none; font-family: 'DM Sans', sans-serif; font-size: .85rem; font-weight: 600; cursor: pointer; transition: all .25s; letter-spacing: .04em; }
-    .btn-primary { background: linear-gradient(130deg, var(--pink), var(--purple)); color: #fff; box-shadow: 0 4px 20px rgba(232, 40, 122, 0.3); }
+    .sidebar-toggle {
+      background: none; border: none; color: rgba(255,255,255,0.5); cursor: pointer;
+      padding: 6px; border-radius: 6px; transition: all 0.2s; display: flex;
+    }
+    .sidebar-toggle:hover { background: rgba(255,255,255,0.08); color: #fff; }
+    .sidebar-nav { flex: 1; overflow-y: auto; padding: 0.75rem 0; }
+    .nav-item {
+      display: flex; align-items: center; padding: 0.65rem 1rem;
+      margin: 2px 0.5rem; border-radius: 8px; color: rgba(255,255,255,0.55);
+      text-decoration: none; transition: all 0.2s; position: relative;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+    .nav-item.active { background: rgba(232, 40, 122, 0.15); color: var(--pink); }
+    .nav-icon { margin-right: 12px; flex-shrink: 0; }
+    .nav-label { flex: 1; font-size: 13.5px; font-weight: 500; }
+    .nav-badge {
+      font-size: 11px; padding: 2px 7px; border-radius: 10px;
+      background: rgba(232, 40, 122, 0.2); color: var(--pink); font-weight: 600;
+    }
+    .nav-badge.new {
+      background: linear-gradient(135deg, var(--pink), var(--purple)); color: #fff;
+      animation: badge-pulse 2s infinite;
+    }
+    @keyframes badge-pulse { 0%,100% { opacity:1; } 50% { opacity:0.7; } }
+    .nav-divider { height: 1px; background: var(--glass-border); margin: 0.6rem 0; }
+    .nav-section { padding: 0.4rem 1rem; }
+    .nav-section-label { font-size: 10px; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: .12em; font-weight: 600; }
+    .sidebar-footer {
+      padding: 0.875rem 1rem; border-top: 1px solid var(--glass-border);
+    }
+    .user-profile { display: flex; align-items: center; gap: 10px; }
+    .user-avatar {
+      width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--pink), var(--purple));
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 600; font-size: 13px; color: #fff;
+    }
+    .user-info { flex: 1; min-width: 0; }
+    .user-name { font-size: 13px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-email { font-size: 11px; color: rgba(255,255,255,0.4); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sidebar-logout {
+      background: none; border: none; color: rgba(255,255,255,0.35); cursor: pointer;
+      padding: 6px; border-radius: 6px; transition: all 0.2s; flex-shrink: 0;
+    }
+    .sidebar-logout:hover { color: #ef4444; background: rgba(239,68,68,0.1); }
+
+    /* ── MAIN CONTENT ─────────────────────────────────────── */
+    .main-content { margin-left: 240px; min-height: 100vh; position: relative; z-index: 1; transition: margin-left 0.3s ease; }
+    .sidebar.collapsed ~ .main-content { margin-left: 0; }
+    .dashboard-wrap { padding: 2rem; max-width: 1200px; }
+
+    /* ── STATS CARDS ──────────────────────────────────────── */
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 1.5rem; }
+    .stat-card {
+      background: var(--glass); backdrop-filter: blur(30px) saturate(180%);
+      border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.4rem;
+    }
+    .stat-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; }
+    .stat-label { font-size: 12px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: .1em; }
+    .stat-change { font-size: 11px; padding: 3px 8px; border-radius: 6px; }
+    .stat-change.positive { color: #10b981; background: rgba(16,185,129,0.1); }
+    .stat-change.warning  { color: #f59e0b; background: rgba(245,158,11,0.1); }
+    .stat-value { font-size: 34px; font-weight: 600; color: #fff; margin-bottom: 0.2rem; }
+    .stat-value.gradient {
+      background: linear-gradient(130deg, var(--pink), var(--purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .stat-total { font-size: 18px; color: rgba(255,255,255,0.35); }
+    .stat-description { font-size: 11.5px; color: rgba(255,255,255,0.45); }
+
+    /* ── ACTIVITY CHART ───────────────────────────────────── */
+    .chart-container {
+      background: var(--glass); backdrop-filter: blur(30px) saturate(180%);
+      border: 1px solid var(--glass-border); border-radius: 16px;
+      padding: 1.4rem; margin-bottom: 1.5rem;
+    }
+    .chart-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+    .chart-label { font-size: 11px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 4px; }
+    .chart-value { display: flex; align-items: baseline; gap: 8px; }
+    #streak-days { font-size: 26px; font-weight: 600; color: #fff; }
+    .streak-badge { font-size: 11px; color: #10b981; background: rgba(16,185,129,0.1); padding: 3px 8px; border-radius: 6px; }
+    .chart-controls { display: flex; gap: 8px; }
+    .chart-btn {
+      font-size: 11.5px; color: rgba(255,255,255,0.55); background: none;
+      border: 1px solid rgba(255,255,255,0.12); padding: 5px 11px; border-radius: 7px;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .chart-btn.active { color: #fff; background: rgba(232,40,122,0.2); border-color: var(--pink); }
+    .chart-canvas-wrapper { position: relative; height: 180px; }
+
+    /* ── MATERIALS WITH PROGRESS ──────────────────────────── */
+    .section-title-sm {
+      font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: .1em;
+      color: #fff; margin-bottom: 1rem;
+    }
+    .materials-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 2rem; }
+    .material-card {
+      background: var(--glass); backdrop-filter: blur(30px) saturate(180%);
+      border: 1px solid var(--glass-border); border-radius: 14px;
+      padding: 1.1rem; display: flex; gap: 14px; align-items: center;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .material-card:hover { border-color: rgba(232,40,122,0.4); }
+    .material-icon {
+      width: 52px; height: 52px; border-radius: 11px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .material-icon.ebook  { background: linear-gradient(135deg, var(--pink), var(--purple)); }
+    .material-icon.course { background: linear-gradient(135deg, var(--purple), #5a1f99); }
+    .material-content { flex: 1; min-width: 0; }
+    .material-title { font-size: 14px; font-weight: 500; color: #fff; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .material-progress { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+    .progress-bar-container { flex: 1; height: 5px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
+    .progress-bar-fill.ebook  { background: linear-gradient(90deg, var(--pink), var(--purple)); }
+    .progress-bar-fill.course { background: linear-gradient(90deg, var(--purple), #5a1f99); }
+    .progress-percentage { font-size: 12px; font-weight: 600; min-width: 36px; text-align: right; }
+    .progress-percentage.ebook  { color: var(--pink); }
+    .progress-percentage.course { color: var(--purple); }
+    .material-meta { font-size: 11px; color: rgba(255,255,255,0.4); }
+
+    /* ── DIVIDER ──────────────────────────────────────────── */
+    .section-divider { height: 1px; background: var(--glass-border); margin: 2rem 0; }
+
+    /* ── LEGACY: grid / card / btn styles ─────────────────── */
+    .btn { padding: .55rem 1.3rem; border-radius: 11px; border: none; font-family: 'DM Sans', sans-serif; font-size: .82rem; font-weight: 600; cursor: pointer; transition: all .25s; letter-spacing: .04em; }
+    .btn-primary { background: linear-gradient(130deg, var(--pink), var(--purple)); color: #fff; box-shadow: 0 4px 16px rgba(232,40,122,0.3); }
     .btn-ghost { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.9); }
-    .btn-small { padding: .4rem 1rem; font-size: .75rem; }
-    .hero { padding: 3rem 2rem 2rem; text-align: center; position: relative; z-index: 1; }
-    .hero h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.5rem, 6vw, 4.5rem); letter-spacing: .1em; margin-bottom: .8rem; }
-    .container { max-width: 1200px; margin: 0 auto; padding: 2rem; position: relative; z-index: 1; }
+    .btn-small { padding: .35rem .9rem; font-size: .73rem; }
     .section-title {
-      font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: .12em; margin-bottom: 1.5rem;
+      font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; letter-spacing: .12em; margin-bottom: 1.4rem;
       background: linear-gradient(130deg, var(--pink), var(--purple));
       -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
     }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.8rem; margin-bottom: 1rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 1.6rem; margin-bottom: 1rem; }
     .card { background: var(--glass); backdrop-filter: blur(20px) saturate(180%); border: 1px solid var(--glass-border); border-radius: 16px; overflow: hidden; transition: all .3s; }
-    .card:hover { border-color: rgba(232,40,122,0.4); box-shadow: 0 12px 40px rgba(0,0,0,0.4); transform: translateY(-6px); }
+    .card:hover { border-color: rgba(232,40,122,0.4); box-shadow: 0 12px 40px rgba(0,0,0,0.4); transform: translateY(-5px); }
     .card img { width: 100%; aspect-ratio: 3/4; object-fit: cover; }
-    .card-info { padding: 1.2rem; }
-    .card-title { font-size: .95rem; font-weight: 600; margin-bottom: .8rem; }
+    .card-info { padding: 1.1rem; }
+    .card-title { font-size: .92rem; font-weight: 600; margin-bottom: .75rem; }
     .upload-placeholder {
       background: rgba(255,255,255,0.03); backdrop-filter: blur(20px);
       border: 2px dashed rgba(232,40,122,0.3); border-radius: 16px;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 1rem; padding: 2rem 1rem; cursor: pointer; transition: all .3s; min-height: 340px;
+      gap: 1rem; padding: 2rem 1rem; cursor: pointer; transition: all .3s; min-height: 320px;
     }
-    .upload-placeholder:hover { background: rgba(232,40,122,0.08); border-color: var(--pink); box-shadow: 0 0 30px rgba(232,40,122,0.2); }
-    .upload-icon { font-size: 3.5rem; opacity: .4; background: linear-gradient(130deg, var(--pink), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-    .upload-text { font-size: .85rem; text-transform: uppercase; letter-spacing: .15em; color: rgba(255,255,255,.5); font-weight: 600; }
+    .upload-placeholder:hover { background: rgba(232,40,122,0.08); border-color: var(--pink); }
+    .upload-icon { font-size: 3rem; opacity: .4; background: linear-gradient(130deg, var(--pink), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .upload-text { font-size: .82rem; text-transform: uppercase; letter-spacing: .15em; color: rgba(255,255,255,.5); font-weight: 600; }
     .loading { display: none; text-align: center; padding: 2rem; color: rgba(255,255,255,.5); }
     .loading.active { display: block; }
-    .spinner { border: 3px solid rgba(255,255,255,.1); border-top-color: var(--pink); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 1rem; }
+    .spinner { border: 3px solid rgba(255,255,255,.1); border-top-color: var(--pink); border-radius: 50%; width: 38px; height: 38px; animation: spin 1s linear infinite; margin: 0 auto 1rem; }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── MOBILE OVERLAY / TOGGLE ──────────────────────────── */
+    .mobile-menu-btn {
+      display: none; position: fixed; top: 1rem; left: 1rem; z-index: 1100;
+      background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--glass-border);
+      border-radius: 10px; padding: 8px; cursor: pointer; color: #fff;
+    }
+    .sidebar-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999;
+    }
+
+    /* ── RESPONSIVE ───────────────────────────────────────── */
+    @media (max-width: 1024px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-240px); }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar-overlay.open { display: block; }
+      .main-content { margin-left: 0; }
+      .mobile-menu-btn { display: flex; }
+      .dashboard-wrap { padding: 1rem; padding-top: 4rem; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .materials-grid { grid-template-columns: 1fr; }
+      .chart-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+    }
   </style>
 </head>
 <body>
-  <nav class="nav">
-    <div class="logo">Marketingowe Imperium</div>
-    <div>
-      <span id="userName" style="margin-right: 1rem;"></span>
-      <button class="btn btn-ghost btn-small" onclick="logout()">Wyloguj</button>
+
+  <!-- Mobile sidebar toggle -->
+  <button class="mobile-menu-btn" onclick="toggleSidebar()" aria-label="Menu">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <span class="sidebar-logo">Marketingowe Imperium</span>
+      <button class="sidebar-toggle" onclick="toggleSidebar()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="sidebar-nav">
+      <a href="dashboard.html" class="nav-item active">
+        <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+        </svg>
+        <span class="nav-label">Dashboard</span>
+      </a>
+
+      <a href="#kursy" class="nav-item" id="navKursy">
+        <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+        <span class="nav-label">Moje Kursy</span>
+        <span class="nav-badge" id="courseBadge" style="display:none">0</span>
+      </a>
+
+      <a href="#ebooki" class="nav-item" id="navEbooki">
+        <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+        </svg>
+        <span class="nav-label">eBooki</span>
+      </a>
+
+      <a href="imperium.html" class="nav-item">
+        <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        <span class="nav-label">Moje Imperium</span>
+        <span class="nav-badge new">NEW</span>
+      </a>
+
+      <div class="nav-divider"></div>
+      <div class="nav-section"><span class="nav-section-label">Konto</span></div>
+
+      <a href="#" class="nav-item" onclick="logout(); return false;">
+        <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        <span class="nav-label">Wyloguj</span>
+      </a>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="user-profile">
+        <div class="user-avatar"><span id="userInitials">--</span></div>
+        <div class="user-info">
+          <div class="user-name" id="userName">...</div>
+          <div class="user-email" id="userEmail">...</div>
+        </div>
+      </div>
     </div>
   </nav>
 
-  <section class="hero">
-    <h1>Witaj, <span id="heroName"></span>!</h1>
-    <div style="display: flex; align-items: center; justify-content: center; gap: 2rem; margin-top: 2rem;">
-      <div style="text-align: center;">
-        <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255,255,255,0.5); margin-bottom: 0.5rem;">Twoje Imperium</div>
-        <div id="progress-percentage" style="font-family: 'Bebas Neue', sans-serif; font-size: 3rem; background: linear-gradient(130deg, var(--pink), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">0%</div>
-      </div>
-      <div style="position: relative; height: 150px; width: 100px;">
-        <div id="tower-base" style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 80px; height: 30px; background: linear-gradient(135deg, rgba(232,40,122,0.6), rgba(139,47,201,0.6)); border-radius: 4px 4px 0 0; opacity: 0.1; transition: opacity 0.5s ease;"></div>
-        <div id="tower-mid" style="position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); width: 70px; height: 30px; background: linear-gradient(135deg, rgba(232,40,122,0.7), rgba(139,47,201,0.7)); border-radius: 4px 4px 0 0; opacity: 0.1; transition: opacity 0.5s ease;"></div>
-        <div id="tower-upper" style="position: absolute; bottom: 60px; left: 50%; transform: translateX(-50%); width: 60px; height: 30px; background: linear-gradient(135deg, rgba(232,40,122,0.8), rgba(139,47,201,0.8)); border-radius: 4px 4px 0 0; opacity: 0.1; transition: opacity 0.5s ease;"></div>
-        <div id="tower-neck" style="position: absolute; bottom: 90px; left: 50%; transform: translateX(-50%); width: 50px; height: 30px; background: linear-gradient(135deg, rgba(232,40,122,0.9), rgba(139,47,201,0.9)); border-radius: 4px 4px 0 0; opacity: 0.1; transition: opacity 0.5s ease;"></div>
-        <div id="tower-spire" style="position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%); width: 40px; height: 30px; background: linear-gradient(135deg, rgb(232,40,122), rgb(139,47,201)); border-radius: 20px 20px 0 0; opacity: 0.1; transition: opacity 0.5s ease;"></div>
-      </div>
-    </div>
-  </section>
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+    <div class="dashboard-wrap">
 
-  <main class="container">
-    <h2 class="section-title">Twoje eBooki</h2>
-    <div class="loading active" id="loadingEbooks"><div class="spinner"></div>Ładowanie ebooków...</div>
-    <div class="grid" id="ebooksGrid"></div>
+      <!-- STATS CARDS -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-label">eBooki</span>
+            <span class="stat-change positive" id="ebooks-change">+0%</span>
+          </div>
+          <div class="stat-value">
+            <span id="ebooks-completed">–</span>
+            <span class="stat-total">/<span id="ebooks-total">–</span></span>
+          </div>
+          <div class="stat-description">Ukończonych materiałów</div>
+        </div>
 
-    <h2 class="section-title" style="margin-top: 4rem;">Kursy Video</h2>
-    <div class="loading active" id="loadingCourses"><div class="spinner"></div>Ładowanie kursów...</div>
-    <div class="grid" id="coursesGrid"></div>
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-label">Kursy</span>
+            <span class="stat-change positive" id="courses-change">+0%</span>
+          </div>
+          <div class="stat-value">
+            <span id="courses-completed">–</span>
+            <span class="stat-total">/<span id="courses-total">–</span></span>
+          </div>
+          <div class="stat-description">Ukończonych kursów wideo</div>
+        </div>
 
-    <div id="adminProgressSection" style="display: none; margin-top: 4rem;">
-      <h2 class="section-title">Progress Uczestników</h2>
-      <div class="loading" id="loadingAdminProgress" style="display: none;"><div class="spinner"></div>Ładowanie danych...</div>
-      <div style="background: var(--glass); backdrop-filter: blur(20px) saturate(180%); border: 1px solid var(--glass-border); border-radius: 16px; overflow: hidden;">
-        <table id="adminProgressTable" style="width: 100%; border-collapse: collapse;">
-          <thead>
-            <tr style="background: rgba(232,40,122,0.1);">
-              <th style="padding: 1rem; text-align: left; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.7);">Uczestnik</th>
-              <th style="padding: 1rem; text-align: center; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.7);">eBooki</th>
-              <th style="padding: 1rem; text-align: center; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.7);">Kursy</th>
-              <th style="padding: 1rem; text-align: center; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.7);">Razem</th>
-              <th style="padding: 1rem; text-align: center; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.7);">Postęp</th>
-            </tr>
-          </thead>
-          <tbody id="adminProgressBody"></tbody>
-        </table>
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="stat-label">Progress</span>
+            <span class="stat-change warning" id="progress-change">+0%</span>
+          </div>
+          <div class="stat-value gradient" id="overall-progress">–%</div>
+          <div class="stat-description">Ukończono całego programu</div>
+        </div>
       </div>
-    </div>
-  </main>
+
+      <!-- ACTIVITY CHART -->
+      <div class="chart-container">
+        <div class="chart-header">
+          <div>
+            <div class="chart-label">Aktywność tygodniowa</div>
+            <div class="chart-value">
+              <span id="streak-days">0 dni</span>
+              <span class="streak-badge" id="streakBadge" style="display:none">🔥 Streak!</span>
+            </div>
+          </div>
+          <div class="chart-controls">
+            <button class="chart-btn active" data-period="week">Tydzień</button>
+          </div>
+        </div>
+        <div class="chart-canvas-wrapper">
+          <canvas id="activityChart"></canvas>
+        </div>
+      </div>
+
+      <!-- MATERIALS WITH PROGRESS -->
+      <div class="section-title-sm">Kontynuuj Naukę</div>
+      <div class="materials-grid" id="materials-container">
+        <div style="grid-column:1/-1; text-align:center; color:rgba(255,255,255,0.3); padding:2rem;">
+          <div class="spinner" style="margin:0 auto 1rem;"></div>Ładowanie...
+        </div>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <!-- EBOOKS SECTION -->
+      <h2 class="section-title" id="ebooki">Twoje eBooki</h2>
+      <div class="loading active" id="loadingEbooks"><div class="spinner"></div>Ładowanie ebooków...</div>
+      <div class="grid" id="ebooksGrid"></div>
+
+      <!-- COURSES SECTION -->
+      <h2 class="section-title" style="margin-top: 3.5rem;" id="kursy">Kursy Video</h2>
+      <div class="loading active" id="loadingCourses"><div class="spinner"></div>Ładowanie kursów...</div>
+      <div class="grid" id="coursesGrid"></div>
+
+      <!-- ADMIN PROGRESS TABLE -->
+      <div id="adminProgressSection" style="display: none; margin-top: 3.5rem;">
+        <h2 class="section-title">Progress Uczestników</h2>
+        <div class="loading" id="loadingAdminProgress" style="display: none;"><div class="spinner"></div>Ładowanie danych...</div>
+        <div style="background: var(--glass); backdrop-filter: blur(20px) saturate(180%); border: 1px solid var(--glass-border); border-radius: 16px; overflow: hidden;">
+          <table id="adminProgressTable" style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr style="background: rgba(232,40,122,0.1);">
+                <th style="padding: 1rem; text-align: left; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.7);">Uczestnik</th>
+                <th style="padding: 1rem; text-align: center; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.7);">eBooki</th>
+                <th style="padding: 1rem; text-align: center; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.7);">Kursy</th>
+                <th style="padding: 1rem; text-align: center; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.7);">Razem</th>
+                <th style="padding: 1rem; text-align: center; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.7);">Postęp</th>
+              </tr>
+            </thead>
+            <tbody id="adminProgressBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /dashboard-wrap -->
+  </div><!-- /main-content -->
 
   <!-- UPLOAD EBOOK MODAL -->
   <div id="uploadEbookModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,.92); backdrop-filter: blur(20px); z-index: 5000; padding: 2rem; overflow-y: auto; align-items: center; justify-content: center;">
@@ -131,11 +412,11 @@
       <form id="uploadEbookForm" onsubmit="handleEbookUpload(event)">
         <div style="margin-bottom: 1.2rem;">
           <label style="display: block; font-size: .8rem; font-weight: 600; color: rgba(255,255,255,.7); margin-bottom: .5rem; text-transform: uppercase; letter-spacing: .12em;">Tytuł</label>
-          <input type="text" id="ebookTitle" required style="width: 100%; padding: .9rem 1rem; background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: .95rem;">
+          <input type="text" id="ebookTitle" required style="width: 100%; padding: .9rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: .95rem;">
         </div>
         <div style="margin-bottom: 1.2rem;">
           <label style="display: block; font-size: .8rem; font-weight: 600; color: rgba(255,255,255,.7); margin-bottom: .5rem; text-transform: uppercase; letter-spacing: .12em;">Plik PDF</label>
-          <label style="display: block; padding: 1.2rem; background: rgba(255,255,255,0.03); backdrop-filter: blur(10px); border: 2px dashed rgba(232,40,122,0.3); border-radius: 12px; text-align: center; cursor: pointer;">
+          <label style="display: block; padding: 1.2rem; background: rgba(255,255,255,0.03); border: 2px dashed rgba(232,40,122,0.3); border-radius: 12px; text-align: center; cursor: pointer;">
             <input type="file" id="pdfFile" accept=".pdf" onchange="updatePdfName()" style="display: none;">
             <span style="color: rgba(255,255,255,.5); font-size: .85rem;">Kliknij aby wybrać PDF</span>
             <div id="pdfFileName" style="margin-top: .5rem; color: var(--pink); font-size: .8rem;"></div>
@@ -143,7 +424,7 @@
         </div>
         <div style="margin-bottom: 1.2rem;">
           <label style="display: block; font-size: .8rem; font-weight: 600; color: rgba(255,255,255,.7); margin-bottom: .5rem; text-transform: uppercase; letter-spacing: .12em;">Okładka (PNG/JPG)</label>
-          <label style="display: block; padding: 1.2rem; background: rgba(255,255,255,0.03); backdrop-filter: blur(10px); border: 2px dashed rgba(232,40,122,0.3); border-radius: 12px; text-align: center; cursor: pointer;">
+          <label style="display: block; padding: 1.2rem; background: rgba(255,255,255,0.03); border: 2px dashed rgba(232,40,122,0.3); border-radius: 12px; text-align: center; cursor: pointer;">
             <input type="file" id="coverFile" accept=".png,.jpg,.jpeg" onchange="updateCoverName()" style="display: none;">
             <span style="color: rgba(255,255,255,.5); font-size: .85rem;">Kliknij aby wybrać okładkę</span>
             <div id="coverFileName" style="margin-top: .5rem; color: var(--pink); font-size: .8rem;"></div>
@@ -167,23 +448,23 @@
       <form id="uploadCourseForm" onsubmit="handleCourseUpload(event)">
         <div style="margin-bottom: 1.2rem;">
           <label style="display: block; font-size: .8rem; font-weight: 600; color: rgba(255,255,255,.7); margin-bottom: .5rem; text-transform: uppercase; letter-spacing: .12em;">Tytuł</label>
-          <input type="text" id="courseTitle" required style="width: 100%; padding: .9rem 1rem; background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: .95rem;">
+          <input type="text" id="courseTitle" required style="width: 100%; padding: .9rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: .95rem;">
         </div>
         <div style="margin-bottom: 1.2rem;">
           <label style="display: block; font-size: .8rem; font-weight: 600; color: rgba(255,255,255,.7); margin-bottom: .5rem; text-transform: uppercase; letter-spacing: .12em;">Opis</label>
-          <textarea id="courseDesc" rows="3" style="width: 100%; padding: .9rem 1rem; background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: .95rem; resize: vertical;"></textarea>
+          <textarea id="courseDesc" rows="3" style="width: 100%; padding: .9rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: .95rem; resize: vertical;"></textarea>
         </div>
         <div style="margin-bottom: 1.2rem;">
           <label style="display: block; font-size: .8rem; font-weight: 600; color: rgba(255,255,255,.7); margin-bottom: .5rem; text-transform: uppercase; letter-spacing: .12em;">URL wideo</label>
-          <input type="url" id="courseVideoUrl" required placeholder="https://youtube.com/watch?v=..." onchange="handleVideoUrlChange()" style="width: 100%; padding: .9rem 1rem; background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: .95rem;">
+          <input type="url" id="courseVideoUrl" required placeholder="https://youtube.com/watch?v=..." onchange="handleVideoUrlChange()" style="width: 100%; padding: .9rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: .95rem;">
         </div>
         <div style="margin-bottom: 1.2rem;">
           <label style="display: block; font-size: .8rem; font-weight: 600; color: rgba(255,255,255,.7); margin-bottom: .5rem; text-transform: uppercase; letter-spacing: .12em;">Thumbnail URL (opcjonalne)</label>
-          <input type="url" id="courseThumbnail" placeholder="Auto-generowane z wideo" style="width: 100%; padding: .9rem 1rem; background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: .95rem;">
+          <input type="url" id="courseThumbnail" placeholder="Auto-generowane z wideo" style="width: 100%; padding: .9rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: .95rem;">
         </div>
         <div style="margin-bottom: 1.2rem;">
           <label style="display: block; font-size: .8rem; font-weight: 600; color: rgba(255,255,255,.7); margin-bottom: .5rem; text-transform: uppercase; letter-spacing: .12em;">Czas trwania (opcjonalne)</label>
-          <input type="text" id="courseDuration" placeholder="np. 45 min" style="width: 100%; padding: .9rem 1rem; background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: .95rem;">
+          <input type="text" id="courseDuration" placeholder="np. 45 min" style="width: 100%; padding: .9rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: .95rem;">
         </div>
         <div style="display: flex; gap: 1rem; margin-top: 2rem;">
           <button type="submit" class="btn btn-primary" style="flex: 1;">Dodaj Kurs</button>
@@ -196,7 +477,7 @@
   <!-- VIDEO MODAL -->
   <div id="videoModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(30px); z-index: 6000; padding: 2rem; align-items: center; justify-content: center;" onclick="closeVideoModal()">
     <div style="position: relative; max-width: 1200px; width: 100%; background: var(--glass); backdrop-filter: blur(30px) saturate(180%); border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.6);" onclick="event.stopPropagation()">
-      <button onclick="closeVideoModal()" style="position: absolute; top: 1rem; right: 1rem; z-index: 10; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); border: none; width: 40px; height: 40px; border-radius: 50%; color: #fff; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center;">×</button>
+      <button onclick="closeVideoModal()" style="position: absolute; top: 1rem; right: 1rem; z-index: 10; background: rgba(0,0,0,0.8); border: none; width: 40px; height: 40px; border-radius: 50%; color: #fff; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center;">×</button>
       <div id="videoContainer" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;"></div>
       <div style="padding: 1.5rem; background: rgba(0,0,0,0.3);">
         <h3 id="videoTitle" style="font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; letter-spacing: 0.08em; margin: 0; background: linear-gradient(130deg, var(--pink), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"></h3>
@@ -216,14 +497,196 @@
     const API_URL = 'https://empirebackend-production.up.railway.app';
     let currentUser = null;
     let userProgress = [];
+    let activityChart = null;
+    let sessionStart = Date.now();
+    let materialsViewedCount = 0;
+    let activitySent = false;
 
+    // ── HELPERS ─────────────────────────────────────────────
+    async function apiFetch(path, options = {}) {
+      const token = localStorage.getItem('token');
+      const res = await fetch(API_URL + path, {
+        ...options,
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...options.headers }
+      });
+      if (!res.ok) throw new Error(`API error ${res.status}`);
+      return res.json();
+    }
+
+    function getInitials(name) {
+      return name ? name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() : '--';
+    }
+
+    // ── SIDEBAR ──────────────────────────────────────────────
+    function toggleSidebar() {
+      const sb = document.getElementById('sidebar');
+      const ov = document.getElementById('sidebarOverlay');
+      if (window.innerWidth <= 768) {
+        sb.classList.toggle('open');
+        ov.classList.toggle('open');
+      } else {
+        sb.classList.toggle('collapsed');
+      }
+    }
+
+    async function loadNavBadges() {
+      try {
+        const data = await apiFetch('/api/nav/badges');
+        const badge = document.getElementById('courseBadge');
+        if (data.inProgressCourses > 0) {
+          badge.textContent = data.inProgressCourses;
+          badge.style.display = '';
+        }
+      } catch (e) { /* non-critical */ }
+    }
+
+    // ── STATS CARDS ──────────────────────────────────────────
+    async function loadStatsCards() {
+      try {
+        const stats = await apiFetch('/api/stats/overview');
+        document.getElementById('ebooks-completed').textContent = stats.ebooksCompleted;
+        document.getElementById('ebooks-total').textContent = stats.ebooksTotal;
+        document.getElementById('ebooks-change').textContent = stats.ebooksChange;
+        document.getElementById('courses-completed').textContent = stats.coursesCompleted;
+        document.getElementById('courses-total').textContent = stats.coursesTotal;
+        document.getElementById('courses-change').textContent = stats.coursesChange;
+        document.getElementById('overall-progress').textContent = stats.overallProgress + '%';
+        document.getElementById('progress-change').textContent = stats.progressChange;
+      } catch (e) { console.error('Stats error:', e); }
+    }
+
+    // ── ACTIVITY CHART ───────────────────────────────────────
+    async function loadActivityChart() {
+      try {
+        const activity = await apiFetch('/api/stats/activity');
+        const streakEl = document.getElementById('streak-days');
+        const badge = document.getElementById('streakBadge');
+        streakEl.textContent = `${activity.currentStreak} dni`;
+        if (activity.currentStreak >= 3) badge.style.display = '';
+
+        const ctx = document.getElementById('activityChart');
+        if (activityChart) activityChart.destroy();
+
+        activityChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: activity.weekData.map(d => d.day),
+            datasets: [{
+              data: activity.weekData.map(d => d.minutes),
+              borderColor: '#e8287a',
+              backgroundColor: 'rgba(232, 40, 122, 0.08)',
+              fill: true, tension: 0.4, borderWidth: 2,
+              pointBackgroundColor: '#e8287a', pointBorderColor: '#fff',
+              pointBorderWidth: 2, pointRadius: 4, pointHoverRadius: 6
+            }]
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: 'rgba(13,13,26,0.95)', titleColor: '#fff',
+                bodyColor: 'rgba(255,255,255,0.8)', borderColor: 'rgba(232,40,122,0.3)',
+                borderWidth: 1, padding: 10, displayColors: false,
+                callbacks: { label: ctx => `${ctx.parsed.y} minut` }
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                grid: { color: 'rgba(255,255,255,0.04)' },
+                ticks: { color: 'rgba(255,255,255,0.4)', font: { size: 10 }, callback: v => v + 'm' }
+              },
+              x: {
+                grid: { display: false },
+                ticks: { color: 'rgba(255,255,255,0.4)', font: { size: 10 } }
+              }
+            }
+          }
+        });
+      } catch (e) { console.error('Chart error:', e); }
+    }
+
+    // ── MATERIALS WITH PROGRESS ──────────────────────────────
+    async function loadMaterialsWithProgress() {
+      try {
+        const materials = await apiFetch('/api/materials/with-progress');
+        const container = document.getElementById('materials-container');
+        if (!materials.length) {
+          container.innerHTML = '<p style="color:rgba(255,255,255,0.3);text-align:center;grid-column:1/-1;padding:2rem;">Brak materiałów do wyświetlenia</p>';
+          return;
+        }
+        const bookIcon = `<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>`;
+        const playIcon = `<polygon points="5 3 19 12 5 21 5 3"/>`;
+
+        container.innerHTML = materials.map(m => {
+          const isEbook = m.type === 'ebook';
+          const itemsText = isEbook
+            ? `Rozdział ${m.completedChapters}/${m.totalChapters}`
+            : `Lekcja ${m.completedLessons}/${m.totalLessons}`;
+          return `
+            <div class="material-card" onclick="openMaterial('${m.type}', ${m.id})">
+              <div class="material-icon ${m.type}">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
+                  ${isEbook ? bookIcon : playIcon}
+                </svg>
+              </div>
+              <div class="material-content">
+                <div class="material-title">${m.title}</div>
+                <div class="material-progress">
+                  <div class="progress-bar-container">
+                    <div class="progress-bar-fill ${m.type}" style="width:${m.progress}%"></div>
+                  </div>
+                  <span class="progress-percentage ${m.type}">${m.progress}%</span>
+                </div>
+                <div class="material-meta">${itemsText} • ${m.author}</div>
+              </div>
+            </div>`;
+        }).join('');
+      } catch (e) {
+        console.error('Materials error:', e);
+        document.getElementById('materials-container').innerHTML = '';
+      }
+    }
+
+    function openMaterial(type, id) {
+      if (type === 'ebook') {
+        downloadEbook(id, '');
+      } else {
+        document.getElementById('kursy').scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    // ── ACTIVITY TRACKING ────────────────────────────────────
+    function startActivityTracking() {
+      document.addEventListener('click', e => {
+        if (e.target.closest('.material-card') || e.target.closest('.card')) materialsViewedCount++;
+      });
+      window.addEventListener('beforeunload', sendActivity);
+      setInterval(sendActivity, 5 * 60 * 1000);
+    }
+
+    async function sendActivity() {
+      if (activitySent) return;
+      const minutesSpent = Math.max(1, Math.round((Date.now() - sessionStart) / 60000));
+      if (minutesSpent < 1 && materialsViewedCount === 0) return;
+      activitySent = true;
+      try {
+        await fetch(`${API_URL}/api/activity/track`, {
+          method: 'POST', keepalive: true,
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` },
+          body: JSON.stringify({ minutesSpent, materialsViewed: materialsViewedCount })
+        });
+      } catch (e) { /* best-effort */ }
+    }
+
+    // ── PROGRESS ─────────────────────────────────────────────
     async function loadProgress() {
       try {
         const token = localStorage.getItem('token');
         const res = await fetch(`${API_URL}/api/progress`, { headers: { Authorization: `Bearer ${token}` } });
         if (!res.ok) throw new Error('Failed');
         userProgress = await res.json();
-        updateProgressBar();
       } catch (e) { console.error('[PROGRESS] Error:', e); }
     }
 
@@ -241,9 +704,13 @@
         await loadProgress();
         loadEbooks();
         loadCourses();
+        loadStatsCards();
+        loadMaterialsWithProgress();
+        try { await apiFetch('/api/empire/award-completion', { method: 'POST' }); } catch(e){}
       } catch (e) { alert('Błąd podczas aktualizacji postępu'); }
     }
 
+    // ── ADMIN PROGRESS ────────────────────────────────────────
     async function loadAdminProgress() {
       const loading = document.getElementById('loadingAdminProgress');
       const tbody = document.getElementById('adminProgressBody');
@@ -278,49 +745,7 @@
       }
     }
 
-    function updateProgressBar() {
-      const totalEbooks = window.totalEbooksCount || 0;
-      const totalCourses = window.totalCoursesCount || 0;
-      const totalMaterials = totalEbooks + totalCourses;
-      if (totalMaterials === 0) return;
-      const completed = userProgress.filter(p => p.completed).length;
-      const percentage = Math.round((completed / totalMaterials) * 100);
-      const segments = [
-        { id: 'tower-base', threshold: 0 }, { id: 'tower-mid', threshold: 20 },
-        { id: 'tower-upper', threshold: 40 }, { id: 'tower-neck', threshold: 60 },
-        { id: 'tower-spire', threshold: 80 }
-      ];
-      segments.forEach(seg => {
-        const el = document.getElementById(seg.id);
-        if (!el) return;
-        el.style.opacity = percentage >= seg.threshold
-          ? (percentage >= seg.threshold + 20 ? 1 : 0.1 + ((percentage - seg.threshold) / 20) * 0.9)
-          : 0.1;
-      });
-      const el = document.getElementById('progress-percentage');
-      if (el) el.textContent = `${percentage}%`;
-    }
-
-    window.addEventListener('DOMContentLoaded', async () => {
-      const token = localStorage.getItem('token');
-      if (!token) { window.location.href = './index.html'; return; }
-      try {
-        const res = await fetch(`${API_URL}/api/verify`, { headers: { Authorization: `Bearer ${token}` } });
-        if (!res.ok) throw new Error('Auth failed');
-        const data = await res.json();
-        currentUser = data.user;
-        document.getElementById('userName').textContent = currentUser.name;
-        document.getElementById('heroName').textContent = currentUser.name.split(' ')[0];
-        await loadProgress();
-        loadEbooks();
-        loadCourses();
-        if (currentUser.role === 'admin') {
-          document.getElementById('adminProgressSection').style.display = 'block';
-          loadAdminProgress();
-        }
-      } catch (e) { logout(); }
-    });
-
+    // ── EBOOKS ────────────────────────────────────────────────
     async function loadEbooks() {
       const grid = document.getElementById('ebooksGrid');
       const loading = document.getElementById('loadingEbooks');
@@ -333,21 +758,19 @@
         loading.classList.remove('active');
         grid.innerHTML = '';
         if (currentUser && currentUser.role === 'admin') {
-          const placeholder = document.createElement('div');
-          placeholder.className = 'upload-placeholder';
-          placeholder.onclick = openUploadEbookModal;
-          placeholder.innerHTML = `<div class="upload-icon">+</div><div class="upload-text">Dodaj eBook</div>`;
-          grid.appendChild(placeholder);
+          const ph = document.createElement('div');
+          ph.className = 'upload-placeholder'; ph.onclick = openUploadEbookModal;
+          ph.innerHTML = `<div class="upload-icon">+</div><div class="upload-text">Dodaj eBook</div>`;
+          grid.appendChild(ph);
         }
-        const fallbackCover = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="267"%3E%3Crect fill="%238b2fc9" width="200" height="267"/%3E%3C/svg%3E';
+        const fallback = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="267"%3E%3Crect fill="%238b2fc9" width="200" height="267"/%3E%3C/svg%3E';
         ebooks.forEach(ebook => {
           const card = document.createElement('div');
           card.className = 'card';
           const safeTitle = ebook.title.replace(/'/g, "\\'");
           const completed = isCompleted('ebook', ebook.id);
-          // ✅ cover_url z signed URL wygenerowanym przez backend
           card.innerHTML = `
-            <img src="${ebook.cover_url || fallbackCover}" alt="${ebook.title}" onerror="this.src='${fallbackCover}'">
+            <img src="${ebook.cover_url || fallback}" alt="${ebook.title}" onerror="this.src='${fallback}'">
             <div class="card-info">
               ${currentUser.role === 'user' ? `
                 <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.8rem; cursor: pointer; padding: 0.5rem; background: rgba(255,255,255,0.03); border-radius: 8px;">
@@ -367,11 +790,10 @@
         if (ebooks.length === 0 && currentUser.role !== 'admin') {
           grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: rgba(255,255,255,.4); padding: 3rem;">Brak dostępnych ebooków</p>';
         }
-      } catch (e) {
-        loading.innerHTML = '<p>Błąd: ' + e.message + '</p>';
-      }
+      } catch (e) { loading.innerHTML = '<p>Błąd: ' + e.message + '</p>'; }
     }
 
+    // ── COURSES ───────────────────────────────────────────────
     async function loadCourses() {
       const grid = document.getElementById('coursesGrid');
       const loading = document.getElementById('loadingCourses');
@@ -384,23 +806,21 @@
         loading.classList.remove('active');
         grid.innerHTML = '';
         if (currentUser && currentUser.role === 'admin') {
-          const placeholder = document.createElement('div');
-          placeholder.className = 'upload-placeholder';
-          placeholder.onclick = openUploadCourseModal;
-          placeholder.innerHTML = `<div class="upload-icon">+</div><div class="upload-text">Dodaj kurs wideo</div>`;
-          grid.appendChild(placeholder);
+          const ph = document.createElement('div');
+          ph.className = 'upload-placeholder'; ph.onclick = openUploadCourseModal;
+          ph.innerHTML = `<div class="upload-icon">+</div><div class="upload-text">Dodaj kurs wideo</div>`;
+          grid.appendChild(ph);
         }
-        const fallbackThumb = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="640" height="360"%3E%3Crect fill="%238b2fc9" width="640" height="360"/%3E%3C/svg%3E';
+        const fallback = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="640" height="360"%3E%3Crect fill="%238b2fc9" width="640" height="360"/%3E%3C/svg%3E';
         courses.forEach(course => {
           const card = document.createElement('div');
           card.className = 'card';
           const completed = isCompleted('course', course.id);
-          // ✅ thumbnail_url (snake_case z PostgreSQL)
           card.innerHTML = `
             <div class="video-thumbnail" style="position: relative; cursor: pointer;">
-              <img src="${course.thumbnail_url || fallbackThumb}" alt="${course.title}" style="aspect-ratio: 16/9; width: 100%; object-fit: cover;">
-              <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: linear-gradient(135deg, var(--pink), var(--purple)); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(232,40,122,0.4);">
-                <div style="width: 0; height: 0; border-left: 20px solid white; border-top: 12px solid transparent; border-bottom: 12px solid transparent; margin-left: 4px;"></div>
+              <img src="${course.thumbnail_url || fallback}" alt="${course.title}" style="aspect-ratio: 16/9; width: 100%; object-fit: cover;">
+              <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 56px; height: 56px; background: linear-gradient(135deg, var(--pink), var(--purple)); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(232,40,122,0.4);">
+                <div style="width: 0; height: 0; border-left: 18px solid white; border-top: 11px solid transparent; border-bottom: 11px solid transparent; margin-left: 4px;"></div>
               </div>
             </div>
             <div class="card-info">
@@ -416,18 +836,16 @@
                   <button class="btn btn-ghost btn-small" onclick="deleteCourse(${course.id})" style="color: #ef4444;">Usuń</button>
                 </div>` : ''}
             </div>`;
-          // ✅ video_url (snake_case)
           card.querySelector('.video-thumbnail').addEventListener('click', () => openVideoModal(course.video_url, course.title));
           grid.appendChild(card);
         });
         if (courses.length === 0 && currentUser.role !== 'admin') {
           grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: rgba(255,255,255,.4); padding: 3rem;">Brak dostępnych kursów</p>';
         }
-      } catch (e) {
-        loading.innerHTML = '<p>Błąd: ' + e.message + '</p>';
-      }
+      } catch (e) { loading.innerHTML = '<p>Błąd: ' + e.message + '</p>'; }
     }
 
+    // ── MODALS ────────────────────────────────────────────────
     function openUploadEbookModal() { document.getElementById('uploadEbookModal').style.display = 'flex'; }
     function closeUploadEbookModal() {
       document.getElementById('uploadEbookModal').style.display = 'none';
@@ -440,44 +858,29 @@
       document.getElementById('uploadCourseModal').style.display = 'none';
       document.getElementById('uploadCourseForm').reset();
     }
-
     function handleVideoUrlChange() {
-      const videoUrl = document.getElementById('courseVideoUrl').value;
-      const thumbnailInput = document.getElementById('courseThumbnail');
-      const ytMatch = videoUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
-      if (ytMatch) thumbnailInput.value = `https://img.youtube.com/vi/${ytMatch[1]}/maxresdefault.jpg`;
+      const url = document.getElementById('courseVideoUrl').value;
+      const th = document.getElementById('courseThumbnail');
+      const m = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+      if (m) th.value = `https://img.youtube.com/vi/${m[1]}/maxresdefault.jpg`;
     }
-
-    function updatePdfName() {
-      const f = document.getElementById('pdfFile').files[0];
-      if (f) document.getElementById('pdfFileName').textContent = f.name;
-    }
-    function updateCoverName() {
-      const f = document.getElementById('coverFile').files[0];
-      if (f) document.getElementById('coverFileName').textContent = f.name;
-    }
+    function updatePdfName() { const f = document.getElementById('pdfFile').files[0]; if (f) document.getElementById('pdfFileName').textContent = f.name; }
+    function updateCoverName() { const f = document.getElementById('coverFile').files[0]; if (f) document.getElementById('coverFileName').textContent = f.name; }
 
     async function handleEbookUpload(e) {
       e.preventDefault();
       const title = document.getElementById('ebookTitle').value.trim();
       const pdfFile = document.getElementById('pdfFile').files[0];
       const coverFile = document.getElementById('coverFile').files[0];
-      if (!title) { alert('Proszę podać tytuł'); return; }
-      if (!pdfFile) { alert('Proszę wybrać PDF'); return; }
-      if (!coverFile) { alert('Proszę wybrać okładkę'); return; }
+      if (!title || !pdfFile || !coverFile) { alert('Wszystkie pola są wymagane'); return; }
       const formData = new FormData();
-      formData.append('title', title);
-      formData.append('pdf', pdfFile);
-      formData.append('cover', coverFile);
+      formData.append('title', title); formData.append('pdf', pdfFile); formData.append('cover', coverFile);
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`${API_URL}/api/ebooks/upload`, {
-          method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: formData
-        });
+        const res = await fetch(`${API_URL}/api/ebooks/upload`, { method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: formData });
         if (!res.ok) { const err = await res.json(); throw new Error(err.error); }
         showGlassToast('eBook dodany pomyślnie!', 'success');
-        closeUploadEbookModal();
-        loadEbooks();
+        closeUploadEbookModal(); loadEbooks(); loadMaterialsWithProgress();
       } catch (e) { showGlassToast('Błąd: ' + e.message, 'error'); }
     }
 
@@ -498,18 +901,14 @@
         });
         if (!res.ok) { const err = await res.json(); throw new Error(err.error); }
         showGlassToast('Kurs dodany pomyślnie!', 'success');
-        closeUploadCourseModal();
-        loadCourses();
+        closeUploadCourseModal(); loadCourses(); loadMaterialsWithProgress();
       } catch (e) { showGlassToast('Błąd: ' + e.message, 'error'); }
     }
 
-    // ✅ Download przez signed URL (Supabase private bucket)
     async function downloadEbook(id, title) {
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`${API_URL}/api/ebooks/${id}/download`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await fetch(`${API_URL}/api/ebooks/${id}/download`, { headers: { Authorization: `Bearer ${token}` } });
         if (!res.ok) throw new Error('Brak dostępu');
         const data = await res.json();
         window.open(data.url, '_blank');
@@ -529,7 +928,7 @@
       try {
         const token = localStorage.getItem('token');
         await fetch(`${API_URL}/api/ebooks/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
-        loadEbooks();
+        loadEbooks(); loadMaterialsWithProgress();
       } catch (e) { showGlassToast('Błąd usuwania', 'error'); }
     }
 
@@ -546,7 +945,7 @@
       try {
         const token = localStorage.getItem('token');
         await fetch(`${API_URL}/api/courses/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
-        loadCourses();
+        loadCourses(); loadMaterialsWithProgress();
       } catch (e) { showGlassToast('Błąd usuwania', 'error'); }
     }
 
@@ -567,10 +966,10 @@
       const modal = document.getElementById('videoModal');
       const container = document.getElementById('videoContainer');
       let embedUrl = '';
-      const ytMatch = videoUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
-      if (ytMatch) embedUrl = `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1&rel=0`;
-      const vimeoMatch = videoUrl.match(/vimeo\.com\/(\d+)/);
-      if (vimeoMatch) embedUrl = `https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=1`;
+      const yt = videoUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+      if (yt) embedUrl = `https://www.youtube.com/embed/${yt[1]}?autoplay=1&rel=0`;
+      const vm = videoUrl.match(/vimeo\.com\/(\d+)/);
+      if (vm) embedUrl = `https://player.vimeo.com/video/${vm[1]}?autoplay=1`;
       if (!embedUrl) embedUrl = videoUrl;
       container.innerHTML = `<iframe src="${embedUrl}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
       document.getElementById('videoTitle').textContent = title;
@@ -585,8 +984,41 @@
     }
 
     function handleVideoEsc(e) { if (e.key === 'Escape') closeVideoModal(); }
-
     function logout() { localStorage.removeItem('token'); window.location.href = './index.html'; }
+
+    // ── INIT ──────────────────────────────────────────────────
+    window.addEventListener('DOMContentLoaded', async () => {
+      const token = localStorage.getItem('token');
+      if (!token) { window.location.href = './index.html'; return; }
+      try {
+        const res = await fetch(`${API_URL}/api/verify`, { headers: { Authorization: `Bearer ${token}` } });
+        if (!res.ok) throw new Error('Auth failed');
+        const data = await res.json();
+        currentUser = data.user;
+
+        document.getElementById('userName').textContent = currentUser.name;
+        document.getElementById('userEmail').textContent = currentUser.email;
+        document.getElementById('userInitials').textContent = getInitials(currentUser.name);
+
+        await loadProgress();
+
+        await Promise.all([
+          loadStatsCards(),
+          loadActivityChart(),
+          loadMaterialsWithProgress(),
+          loadNavBadges(),
+          loadEbooks(),
+          loadCourses()
+        ]);
+
+        if (currentUser.role === 'admin') {
+          document.getElementById('adminProgressSection').style.display = 'block';
+          loadAdminProgress();
+        }
+
+        startActivityTracking();
+      } catch (e) { logout(); }
+    });
   </script>
 </body>
 </html>

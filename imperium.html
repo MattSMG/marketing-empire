@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moje Imperium - Marketingowe Imperium</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --pink:   #e8287a;
+      --purple: #8b2fc9;
+      --dark:   #06060f;
+      --glass:  rgba(13, 13, 26, 0.6);
+      --glass-border: rgba(255, 255, 255, 0.1);
+    }
+    body { background: var(--dark); color: #fff; font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background: radial-gradient(circle at 15% 40%, rgba(232,40,122,0.08) 0%, transparent 50%),
+                  radial-gradient(circle at 85% 70%, rgba(139,47,201,0.08) 0%, transparent 50%);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ── SIDEBAR ─────────────────────────────────────────── */
+    .sidebar {
+      position: fixed; left: 0; top: 0; width: 240px; height: 100vh;
+      background: rgba(8,8,18,0.97); backdrop-filter: blur(20px);
+      border-right: 1px solid var(--glass-border);
+      display: flex; flex-direction: column; z-index: 1000;
+      transition: transform 0.3s ease;
+    }
+    .sidebar.collapsed { transform: translateX(-240px); }
+    .sidebar-header {
+      padding: 1.25rem 1rem; border-bottom: 1px solid var(--glass-border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .sidebar-logo {
+      font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; letter-spacing: .1em;
+      background: linear-gradient(130deg, var(--pink), var(--purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .sidebar-toggle {
+      background: none; border: none; color: rgba(255,255,255,0.5); cursor: pointer;
+      padding: 6px; border-radius: 6px; transition: all 0.2s; display: flex;
+    }
+    .sidebar-toggle:hover { background: rgba(255,255,255,0.08); color: #fff; }
+    .sidebar-nav { flex: 1; overflow-y: auto; padding: 0.75rem 0; }
+    .nav-item {
+      display: flex; align-items: center; padding: 0.65rem 1rem;
+      margin: 2px 0.5rem; border-radius: 8px; color: rgba(255,255,255,0.55);
+      text-decoration: none; transition: all 0.2s;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+    .nav-item.active { background: rgba(232,40,122,0.15); color: var(--pink); }
+    .nav-icon { margin-right: 12px; flex-shrink: 0; }
+    .nav-label { flex: 1; font-size: 13.5px; font-weight: 500; }
+    .nav-badge {
+      font-size: 11px; padding: 2px 7px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--pink), var(--purple)); color: #fff;
+      font-weight: 600; animation: badge-pulse 2s infinite;
+    }
+    @keyframes badge-pulse { 0%,100% { opacity:1; } 50% { opacity:0.7; } }
+    .nav-divider { height: 1px; background: var(--glass-border); margin: 0.6rem 0; }
+    .nav-section { padding: 0.4rem 1rem; }
+    .nav-section-label { font-size: 10px; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: .12em; font-weight: 600; }
+    .sidebar-footer { padding: 0.875rem 1rem; border-top: 1px solid var(--glass-border); }
+    .user-profile { display: flex; align-items: center; gap: 10px; }
+    .user-avatar {
+      width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--pink), var(--purple));
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 600; font-size: 13px; color: #fff;
+    }
+    .user-info { flex: 1; min-width: 0; }
+    .user-name { font-size: 13px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-email { font-size: 11px; color: rgba(255,255,255,0.4); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* ── MAIN CONTENT ─────────────────────────────────────── */
+    .main-content { margin-left: 240px; min-height: 100vh; position: relative; z-index: 1; }
+    .page-wrap { padding: 2rem; max-width: 1200px; }
+
+    /* ── EMPIRE HEADER ────────────────────────────────────── */
+    .empire-header {
+      background: var(--glass); backdrop-filter: blur(30px) saturate(180%);
+      border: 1px solid var(--glass-border); border-radius: 16px;
+      padding: 2rem; margin-bottom: 2rem;
+    }
+    .empire-title { display: flex; align-items: center; gap: 16px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .empire-title h1 {
+      font-family: 'Bebas Neue', sans-serif; font-size: clamp(1.8rem, 4vw, 2.8rem); letter-spacing: .1em;
+      background: linear-gradient(130deg, var(--pink), var(--purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .level-badge {
+      font-size: 13px; color: #fff; background: rgba(232,40,122,0.2);
+      border: 1px solid var(--pink); padding: 5px 14px; border-radius: 20px; white-space: nowrap;
+    }
+    .level-badge strong { font-size: 17px; font-weight: 700; }
+    .empire-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 1.5rem; }
+    .empire-stat {
+      display: flex; align-items: center; gap: 12px; padding: 0.875rem 1rem;
+      background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);
+    }
+    .stat-icon {
+      font-size: 24px; width: 44px; height: 44px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(232,40,122,0.1); border-radius: 10px;
+    }
+    .stat-val { font-size: 22px; font-weight: 600; color: #fff; margin-bottom: 2px; }
+    .stat-lbl { font-size: 11px; color: rgba(255,255,255,0.45); }
+    .xp-bar-container { margin-top: 1rem; }
+    .xp-bar-label { display: flex; justify-content: space-between; font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 7px; }
+    .xp-bar { height: 7px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden; }
+    .xp-bar-fill { height: 100%; background: linear-gradient(90deg, var(--pink), var(--purple)); border-radius: 4px; transition: width 0.6s ease; }
+
+    /* ── SECTION ──────────────────────────────────────────── */
+    .section { margin-bottom: 2rem; }
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 10px; }
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; letter-spacing: .1em; color: #fff;
+    }
+    .section-badge {
+      font-size: 12px; color: rgba(255,255,255,0.55);
+      background: rgba(255,255,255,0.05); padding: 5px 11px; border-radius: 8px;
+    }
+    .filter-row { display: flex; gap: 7px; flex-wrap: wrap; }
+    .filter-btn {
+      font-size: 11.5px; color: rgba(255,255,255,0.55);
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+      padding: 5px 11px; border-radius: 7px; cursor: pointer; transition: all 0.2s;
+    }
+    .filter-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    .filter-btn.active { background: rgba(232,40,122,0.2); border-color: var(--pink); color: var(--pink); }
+
+    /* ── QUESTS ───────────────────────────────────────────── */
+    .quests-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .quest-card {
+      background: var(--glass); backdrop-filter: blur(30px) saturate(180%);
+      border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.2rem;
+    }
+    .quest-card.completed { border-color: rgba(16,185,129,0.4); background: rgba(16,185,129,0.04); }
+    .quest-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.875rem; }
+    .quest-icon {
+      font-size: 22px; width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(232,40,122,0.1); border-radius: 8px;
+    }
+    .quest-reward { font-size: 11.5px; color: #f59e0b; background: rgba(245,158,11,0.1); padding: 3px 8px; border-radius: 6px; font-weight: 600; }
+    .quest-text { font-size: 13.5px; color: #fff; margin-bottom: 1rem; line-height: 1.5; }
+    .quest-progress { display: flex; align-items: center; gap: 10px; }
+    .quest-bar { flex: 1; height: 5px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
+    .quest-bar-fill { height: 100%; background: linear-gradient(90deg, var(--pink), var(--purple)); border-radius: 3px; transition: width 0.3s; }
+    .quest-progress-text { font-size: 11.5px; color: rgba(255,255,255,0.5); font-weight: 600; }
+    .quest-done { font-size: 12.5px; color: #10b981; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+
+    /* ── EMPIRE MAP ───────────────────────────────────────── */
+    .empire-map {
+      background: var(--glass); backdrop-filter: blur(30px) saturate(180%);
+      border: 1px solid var(--glass-border); border-radius: 16px;
+      padding: 2rem; min-height: 480px; position: relative; overflow: hidden;
+    }
+    .map-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+    }
+    .building-card {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px; padding: 1rem; text-align: center; cursor: pointer;
+      transition: all 0.2s; position: relative;
+    }
+    .building-card:hover { border-color: rgba(232,40,122,0.3); background: rgba(255,255,255,0.05); }
+    .building-card.unlocked { border-color: rgba(232,40,122,0.25); }
+    .building-card.locked { opacity: 0.45; }
+    .building-emoji { font-size: 36px; display: block; margin-bottom: 8px; }
+    .building-name { font-size: 12.5px; font-weight: 500; color: rgba(255,255,255,0.85); margin-bottom: 5px; }
+    .building-cat { font-size: 10.5px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: .08em; }
+    .building-lv {
+      position: absolute; top: 8px; right: 8px; font-size: 10px;
+      background: var(--pink); color: #fff; padding: 2px 6px; border-radius: 8px; font-weight: 600;
+    }
+    .building-lock { font-size: 18px; position: absolute; top: 8px; right: 8px; }
+    .building-req { font-size: 10.5px; color: rgba(255,255,255,0.3); margin-top: 6px; }
+
+    /* ── ACHIEVEMENTS ─────────────────────────────────────── */
+    .achievements-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .achievement-card {
+      background: var(--glass); backdrop-filter: blur(30px) saturate(180%);
+      border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.2rem;
+      text-align: center; cursor: pointer; transition: all 0.2s; position: relative;
+    }
+    .achievement-card:hover { border-color: rgba(232,40,122,0.4); }
+    .achievement-card.earned { border-color: rgba(245,158,11,0.35); }
+    .achievement-card.locked { opacity: 0.4; }
+    .rarity-tag {
+      position: absolute; top: 8px; right: 8px; font-size: 9.5px;
+      padding: 3px 7px; border-radius: 5px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+    }
+    .rarity-tag.common    { background: rgba(156,163,175,0.2); color: #9ca3af; }
+    .rarity-tag.rare      { background: rgba(59,130,246,0.2);  color: #60a5fa; }
+    .rarity-tag.epic      { background: rgba(168,85,247,0.2);  color: #c084fc; }
+    .rarity-tag.legendary { background: rgba(245,158,11,0.2);  color: #fbbf24; }
+    .ach-icon { font-size: 40px; margin-bottom: 10px; display: block; }
+    .ach-name { font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 4px; }
+    .ach-desc { font-size: 11px; color: rgba(255,255,255,0.45); line-height: 1.4; margin-bottom: 10px; }
+    .ach-reward { font-size: 11.5px; color: #f59e0b; font-weight: 600; }
+    .ach-earned { font-size: 11px; color: #10b981; margin-top: 8px; font-weight: 600; }
+
+    /* ── MOBILE ───────────────────────────────────────────── */
+    .mobile-menu-btn {
+      display: none; position: fixed; top: 1rem; left: 1rem; z-index: 1100;
+      background: var(--glass); backdrop-filter: blur(20px); border: 1px solid var(--glass-border);
+      border-radius: 10px; padding: 8px; cursor: pointer; color: #fff;
+    }
+    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; }
+
+    @media (max-width: 1024px) {
+      .empire-stats { grid-template-columns: repeat(2, 1fr); }
+      .quests-grid { grid-template-columns: repeat(2, 1fr); }
+      .achievements-grid { grid-template-columns: repeat(3, 1fr); }
+      .map-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-240px); }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar-overlay.open { display: block; }
+      .main-content { margin-left: 0; }
+      .mobile-menu-btn { display: flex; }
+      .page-wrap { padding: 1rem; padding-top: 4rem; }
+      .empire-stats { grid-template-columns: 1fr; }
+      .quests-grid { grid-template-columns: 1fr; }
+      .achievements-grid { grid-template-columns: repeat(2, 1fr); }
+      .map-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .loading-placeholder {
+      grid-column: 1/-1; text-align: center; padding: 3rem;
+      color: rgba(255,255,255,0.3);
+    }
+    .spinner { border: 3px solid rgba(255,255,255,.1); border-top-color: var(--pink); border-radius: 50%; width: 36px; height: 36px; animation: spin 1s linear infinite; margin: 0 auto 1rem; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <button class="mobile-menu-btn" onclick="toggleSidebar()">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <span class="sidebar-logo">Marketingowe Imperium</span>
+      <button class="sidebar-toggle" onclick="toggleSidebar()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="sidebar-nav">
+      <a href="dashboard.html" class="nav-item">
+        <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+        </svg>
+        <span class="nav-label">Dashboard</span>
+      </a>
+
+      <a href="dashboard.html#kursy" class="nav-item">
+        <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+        <span class="nav-label">Moje Kursy</span>
+      </a>
+
+      <a href="dashboard.html#ebooki" class="nav-item">
+        <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+        </svg>
+        <span class="nav-label">eBooki</span>
+      </a>
+
+      <a href="imperium.html" class="nav-item active">
+        <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        <span class="nav-label">Moje Imperium</span>
+        <span class="nav-badge">NEW</span>
+      </a>
+
+      <div class="nav-divider"></div>
+      <div class="nav-section"><span class="nav-section-label">Konto</span></div>
+
+      <a href="#" class="nav-item" onclick="logout(); return false;">
+        <svg class="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        <span class="nav-label">Wyloguj</span>
+      </a>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="user-profile">
+        <div class="user-avatar"><span id="userInitials">--</span></div>
+        <div class="user-info">
+          <div class="user-name" id="userName">...</div>
+          <div class="user-email" id="userEmail">...</div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    <div class="page-wrap">
+
+      <!-- EMPIRE HEADER -->
+      <div class="empire-header">
+        <div class="empire-title">
+          <h1 id="empire-name">Twoje Imperium</h1>
+          <span class="level-badge">Poziom <strong id="empire-level">1</strong></span>
+        </div>
+
+        <div class="empire-stats">
+          <div class="empire-stat">
+            <div class="stat-icon">⚡</div>
+            <div>
+              <div class="stat-val" id="influence-points">0</div>
+              <div class="stat-lbl">Influence Points</div>
+            </div>
+          </div>
+          <div class="empire-stat">
+            <div class="stat-icon">🏛️</div>
+            <div>
+              <div class="stat-val"><span id="buildings-unlocked">0</span>/<span id="buildings-total">–</span></div>
+              <div class="stat-lbl">Budynki odblokowane</div>
+            </div>
+          </div>
+          <div class="empire-stat">
+            <div class="stat-icon">🏆</div>
+            <div>
+              <div class="stat-val"><span id="achievements-earned">0</span>/<span id="achievements-total">–</span></div>
+              <div class="stat-lbl">Osiągnięcia zdobyte</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="xp-bar-container">
+          <div class="xp-bar-label">
+            <span>Postęp do następnego poziomu</span>
+            <span><strong id="current-xp">0</strong> / <span id="next-level-xp">500</span> XP</span>
+          </div>
+          <div class="xp-bar">
+            <div class="xp-bar-fill" id="xp-bar-fill" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DAILY QUESTS -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title">Dzisiejsze Wyzwania</div>
+          <span class="section-badge"><span id="quests-completed">0</span>/<span id="quests-total">3</span> ukończone</span>
+        </div>
+        <div class="quests-grid" id="quests-container">
+          <div class="loading-placeholder"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <!-- BUILDINGS MAP -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title">Mapa Imperium</div>
+          <div class="filter-row" id="buildingFilters">
+            <button class="filter-btn active" data-cat="all">Wszystkie</button>
+            <button class="filter-btn" data-cat="content">Content</button>
+            <button class="filter-btn" data-cat="marketing">Marketing</button>
+            <button class="filter-btn" data-cat="analytics">Analytics</button>
+            <button class="filter-btn" data-cat="automation">Automation</button>
+          </div>
+        </div>
+        <div class="empire-map">
+          <div class="map-grid" id="buildings-container">
+            <div class="loading-placeholder"><div class="spinner"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACHIEVEMENTS -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title">Osiągnięcia</div>
+          <div class="filter-row" id="achFilters">
+            <button class="filter-btn active" data-rarity="all">Wszystkie</button>
+            <button class="filter-btn" data-rarity="common">Zwykłe</button>
+            <button class="filter-btn" data-rarity="rare">Rzadkie</button>
+            <button class="filter-btn" data-rarity="epic">Epickie</button>
+            <button class="filter-btn" data-rarity="legendary">Legendarne</button>
+          </div>
+        </div>
+        <div class="achievements-grid" id="achievements-container">
+          <div class="loading-placeholder"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'https://empirebackend-production.up.railway.app';
+
+    async function apiFetch(path, opts = {}) {
+      const token = localStorage.getItem('token');
+      const res = await fetch(API_URL + path, {
+        ...opts,
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...opts.headers }
+      });
+      if (!res.ok) throw new Error(`API ${res.status}`);
+      return res.json();
+    }
+
+    function getInitials(name) {
+      return name ? name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() : '--';
+    }
+
+    function toggleSidebar() {
+      const sb = document.getElementById('sidebar');
+      const ov = document.getElementById('sidebarOverlay');
+      if (window.innerWidth <= 768) {
+        sb.classList.toggle('open');
+        ov.classList.toggle('open');
+      } else {
+        sb.classList.toggle('collapsed');
+      }
+    }
+
+    function logout() { localStorage.removeItem('token'); window.location.href = './index.html'; }
+
+    // ── RENDER FUNCTIONS ─────────────────────────────────────
+
+    function renderOverview(data) {
+      document.getElementById('empire-name').textContent = data.empire.name;
+      document.getElementById('empire-level').textContent = data.empire.level;
+      document.getElementById('influence-points').textContent = data.empire.influencePoints;
+      document.getElementById('buildings-unlocked').textContent = data.buildings.unlocked;
+      document.getElementById('buildings-total').textContent = data.buildings.total;
+      document.getElementById('achievements-earned').textContent = data.achievements.earned;
+      document.getElementById('achievements-total').textContent = data.achievements.total;
+
+      const pct = data.empire.experienceToNextLevel > 0
+        ? Math.min(100, Math.round((data.empire.experiencePoints / data.empire.experienceToNextLevel) * 100))
+        : 0;
+      document.getElementById('current-xp').textContent = data.empire.experiencePoints;
+      document.getElementById('next-level-xp').textContent = data.empire.experienceToNextLevel;
+      document.getElementById('xp-bar-fill').style.width = pct + '%';
+
+      const icons = { watch_lesson: '📺', spend_time: '⏰', complete_material: '📖' };
+      const quests = data.dailyQuests || [];
+      const completed = quests.filter(q => q.completed).length;
+      document.getElementById('quests-completed').textContent = completed;
+      document.getElementById('quests-total').textContent = quests.length;
+
+      const qc = document.getElementById('quests-container');
+      if (!quests.length) {
+        qc.innerHTML = '<div class="loading-placeholder" style="color:rgba(255,255,255,0.3)">Brak wyzwań na dziś</div>';
+        return;
+      }
+      qc.innerHTML = quests.map(q => {
+        const pct = q.target > 0 ? Math.min(100, Math.round((q.progress / q.target) * 100)) : 0;
+        return `
+          <div class="quest-card ${q.completed ? 'completed' : ''}">
+            <div class="quest-header">
+              <div class="quest-icon">${icons[q.type] || '✨'}</div>
+              <div class="quest-reward">+${q.reward} IP</div>
+            </div>
+            <div class="quest-text">${q.text}</div>
+            ${q.completed
+              ? `<div class="quest-done">✓ Ukończone!</div>`
+              : `<div class="quest-progress">
+                   <div class="quest-bar"><div class="quest-bar-fill" style="width:${pct}%"></div></div>
+                   <span class="quest-progress-text">${q.progress}/${q.target}</span>
+                 </div>`
+            }
+          </div>`;
+      }).join('');
+    }
+
+    function renderBuildings(data, filterCat = 'all') {
+      const container = document.getElementById('buildings-container');
+      const buildings = data.buildings.filter(b => filterCat === 'all' || b.category === filterCat);
+      if (!buildings.length) {
+        container.innerHTML = '<div class="loading-placeholder">Brak budynków</div>';
+        return;
+      }
+      container.innerHTML = buildings.map(b => `
+        <div class="building-card ${b.unlocked ? 'unlocked' : 'locked'}" data-cat="${b.category}" onclick="handleBuildingClick(${b.id}, ${b.unlocked}, ${b.influenceCost})">
+          ${b.unlocked ? `<span class="building-lv">Lv${b.level}</span>` : `<span class="building-lock">🔒</span>`}
+          <span class="building-emoji">${b.icon}</span>
+          <div class="building-name">${b.name}</div>
+          <div class="building-cat">${b.category}</div>
+          ${!b.unlocked && b.influenceCost > 0 ? `<div class="building-req">⚡ ${b.influenceCost} IP</div>` : ''}
+          ${!b.unlocked && b.influenceCost === 0 ? `<div class="building-req">${b.unlockRequirement || 'Zdobądź poziom'}</div>` : ''}
+        </div>`
+      ).join('');
+    }
+
+    let buildingsCache = null;
+
+    async function handleBuildingClick(id, unlocked, cost) {
+      if (unlocked) return;
+      if (cost === 0) { alert('Dokończ wymagane materiały aby odblokować ten budynek!'); return; }
+      if (!confirm(`Odblokować za ${cost} Influence Points?`)) return;
+      try {
+        const res = await apiFetch('/api/empire/unlock-building', {
+          method: 'POST', body: JSON.stringify({ buildingId: id })
+        });
+        alert(`✅ ${res.building.name} odblokowany! +${res.experienceGained} XP`);
+        loadEmpirePage();
+      } catch (e) {
+        alert('Błąd: ' + (e.message || 'Nie można odblokować'));
+      }
+    }
+
+    function renderAchievements(data, filterRarity = 'all') {
+      const container = document.getElementById('achievements-container');
+      const achs = data.achievements.filter(a => filterRarity === 'all' || a.rarity === filterRarity);
+      if (!achs.length) {
+        container.innerHTML = '<div class="loading-placeholder">Brak osiągnięć</div>';
+        return;
+      }
+      const rarityPL = { common: 'Zwykłe', rare: 'Rzadkie', epic: 'Epickie', legendary: 'Legendarne' };
+      container.innerHTML = achs.map(a => `
+        <div class="achievement-card ${a.earned ? 'earned' : 'locked'}">
+          <span class="rarity-tag ${a.rarity}">${rarityPL[a.rarity] || a.rarity}</span>
+          <span class="ach-icon">${a.earned ? (a.icon || '🏆') : '🔒'}</span>
+          <div class="ach-name">${a.name}</div>
+          <div class="ach-desc">${a.description}</div>
+          <div class="ach-reward">+${a.influenceReward} IP</div>
+          ${a.earned ? `<div class="ach-earned">✓ Zdobyte</div>` : ''}
+        </div>`
+      ).join('');
+    }
+
+    // ── FILTER BUTTONS ───────────────────────────────────────
+
+    let achData = null;
+
+    document.getElementById('buildingFilters').addEventListener('click', e => {
+      const btn = e.target.closest('.filter-btn');
+      if (!btn || !buildingsCache) return;
+      document.querySelectorAll('#buildingFilters .filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderBuildings(buildingsCache, btn.dataset.cat);
+    });
+
+    document.getElementById('achFilters').addEventListener('click', e => {
+      const btn = e.target.closest('.filter-btn');
+      if (!btn || !achData) return;
+      document.querySelectorAll('#achFilters .filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderAchievements(achData, btn.dataset.rarity);
+    });
+
+    // ── LOAD ─────────────────────────────────────────────────
+
+    async function loadEmpirePage() {
+      try {
+        const [overview, buildings, achievements] = await Promise.all([
+          apiFetch('/api/empire/overview'),
+          apiFetch('/api/empire/buildings'),
+          apiFetch('/api/empire/achievements')
+        ]);
+        buildingsCache = buildings;
+        achData = achievements;
+        renderOverview(overview);
+        renderBuildings(buildings);
+        renderAchievements(achievements);
+      } catch (e) {
+        console.error('Empire load error:', e);
+      }
+    }
+
+    // ── INIT ─────────────────────────────────────────────────
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      const token = localStorage.getItem('token');
+      if (!token) { window.location.href = './index.html'; return; }
+      try {
+        const res = await fetch(`${API_URL}/api/verify`, { headers: { Authorization: `Bearer ${token}` } });
+        if (!res.ok) throw new Error('Auth');
+        const { user } = await res.json();
+        document.getElementById('userName').textContent = user.name;
+        document.getElementById('userEmail').textContent = user.email;
+        document.getElementById('userInitials').textContent = getInitials(user.name);
+        await loadEmpirePage();
+      } catch (e) { logout(); }
+    });
+  </script>
+</body>
+</html>
