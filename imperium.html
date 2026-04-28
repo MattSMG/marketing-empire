@@ -592,11 +592,13 @@
     function toggleSidebar() {
       const sb = document.getElementById('sidebar');
       const ov = document.getElementById('sidebarOverlay');
+      const menuBtn = document.querySelector('.mobile-menu-btn');
       if (window.innerWidth <= 768) {
         sb.classList.toggle('open');
         ov.classList.toggle('open');
       } else {
-        sb.classList.toggle('collapsed');
+        const isNowCollapsed = sb.classList.toggle('collapsed');
+        if (menuBtn) menuBtn.style.display = isNowCollapsed ? 'flex' : 'none';
       }
     }
 
