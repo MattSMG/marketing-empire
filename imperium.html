@@ -237,6 +237,115 @@
     }
     .spinner { border: 3px solid rgba(255,255,255,.1); border-top-color: var(--pink); border-radius: 50%; width: 36px; height: 36px; animation: spin 1s linear infinite; margin: 0 auto 1rem; }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── UNLOCK MODAL ─────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.72); backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 9999; animation: modalFadeIn 0.2s ease;
+    }
+    @keyframes modalFadeIn { from { opacity:0; } to { opacity:1; } }
+
+    .modal-container {
+      background: rgba(13,13,26,0.97); backdrop-filter: blur(40px) saturate(180%);
+      border: 1px solid rgba(255,255,255,0.15); border-radius: 20px;
+      max-width: 420px; width: 90%; overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.55);
+      animation: modalSlideUp 0.3s ease; position: relative;
+    }
+    @keyframes modalSlideUp {
+      from { opacity:0; transform: translateY(20px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+
+    .modal-header {
+      background: linear-gradient(135deg, rgba(232,40,122,0.15), rgba(139,47,201,0.15));
+      padding: 2rem 1.5rem 1.5rem; text-align: center; position: relative;
+    }
+    .building-preview {
+      width: 80px; height: 80px; margin: 0 auto 16px;
+      background: linear-gradient(135deg, var(--pink), var(--purple));
+      border-radius: 16px; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 8px 24px rgba(232,40,122,0.3); font-size: 48px;
+    }
+    .modal-title {
+      font-size: 22px; font-weight: 600; color: #fff; margin: 0 0 6px;
+      font-family: 'Bebas Neue', sans-serif; letter-spacing: .08em;
+    }
+    .modal-subtitle { font-size: 13.5px; color: rgba(255,255,255,0.55); margin: 0; }
+
+    .modal-body { padding: 1.5rem; }
+
+    .modal-benefits {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px; padding: 1rem; margin-bottom: 1.25rem;
+    }
+    .benefits-label {
+      font-size: 11.5px; color: rgba(255,255,255,0.45); margin-bottom: 8px;
+      text-transform: uppercase; letter-spacing: .1em;
+    }
+    .modal-benefits ul { margin: 0; padding-left: 20px; color: rgba(255,255,255,0.8); font-size: 13.5px; line-height: 1.85; }
+
+    .modal-cost {
+      display: flex; align-items: center; gap: 12px; padding: 1rem;
+      background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.2);
+      border-radius: 12px; margin-bottom: 1.25rem;
+    }
+    .cost-icon { font-size: 30px; }
+    .cost-label { font-size: 12px; color: rgba(255,255,255,0.45); margin-bottom: 2px; }
+    .cost-value { font-size: 22px; font-weight: 600; color: #f59e0b; }
+    .cost-unit { font-size: 14px; font-weight: 400; }
+
+    .modal-balance { text-align: center; margin-bottom: 1.5rem; }
+    .balance-label { font-size: 11.5px; color: rgba(255,255,255,0.45); margin-bottom: 4px; }
+    .balance-value { font-size: 15px; font-weight: 500; color: #10b981; }
+    .balance-value .bal-amount { font-size: 19px; font-weight: 600; }
+    .balance-remaining { font-size: 12.5px; color: rgba(255,255,255,0.35); margin-left: 6px; }
+
+    .modal-actions { display: flex; gap: 12px; }
+    .btn-cancel {
+      flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.7); padding: 13px 20px; border-radius: 12px;
+      font-size: 14.5px; font-weight: 500; cursor: pointer; transition: all 0.2s;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .btn-cancel:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    .btn-confirm {
+      flex: 1.5; background: linear-gradient(135deg, var(--pink), var(--purple));
+      border: none; color: #fff; padding: 13px 20px; border-radius: 12px;
+      font-size: 14.5px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+      box-shadow: 0 4px 16px rgba(232,40,122,0.3); font-family: 'DM Sans', sans-serif;
+    }
+    .btn-confirm:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(232,40,122,0.4); }
+    .btn-confirm:active:not(:disabled) { transform: translateY(0); }
+    .btn-confirm.insufficient {
+      background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.35);
+      color: #ef4444; cursor: not-allowed; box-shadow: none;
+    }
+    .btn-confirm:disabled { cursor: not-allowed; opacity: 0.7; }
+
+    .modal-close {
+      position: absolute; top: 14px; right: 14px; width: 30px; height: 30px;
+      background: rgba(255,255,255,0.1); border: none; border-radius: 7px;
+      color: rgba(255,255,255,0.55); cursor: pointer;
+      display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+    }
+    .modal-close:hover { background: rgba(255,255,255,0.15); color: #fff; }
+
+    @keyframes slideInRight {
+      from { opacity:0; transform: translateX(100%); }
+      to   { opacity:1; transform: translateX(0); }
+    }
+    @keyframes slideOutRight {
+      from { opacity:1; transform: translateX(0); }
+      to   { opacity:0; transform: translateX(100%); }
+    }
+
+    @media (max-width: 480px) {
+      .modal-container { max-width: 100%; border-radius: 20px 20px 0 0; margin-top: auto; align-self: flex-end; }
+      .modal-actions { flex-direction: column; }
+    }
   </style>
 </head>
 <body>
@@ -409,6 +518,60 @@
     </div>
   </div>
 
+  <!-- Building Unlock Modal -->
+  <div id="unlock-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-container">
+
+      <div class="modal-header">
+        <div class="building-preview" id="modal-building-icon">🏛️</div>
+        <h2 class="modal-title" id="modal-building-name">Nazwa budynku</h2>
+        <p class="modal-subtitle" id="modal-building-category">Kategoria</p>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-benefits">
+          <div class="benefits-label">Odblokowuje:</div>
+          <ul id="modal-benefits-list">
+            <li>Dostęp do unikalnych funkcji</li>
+          </ul>
+        </div>
+
+        <div class="modal-cost">
+          <div class="cost-icon">⚡</div>
+          <div style="flex:1">
+            <div class="cost-label">Koszt odblokowania</div>
+            <div class="cost-value">
+              <span id="modal-cost-amount">0</span>
+              <span class="cost-unit"> Influence Points</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-balance">
+          <div class="balance-label">Twoje saldo</div>
+          <div class="balance-value">
+            <span class="bal-amount" id="modal-current-ip">0</span> IP
+            <span class="balance-remaining">(pozostanie <span id="modal-remaining-ip">0</span> IP)</span>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-cancel" onclick="closeUnlockModal()">Anuluj</button>
+          <button class="btn-confirm" id="btn-confirm" onclick="confirmUnlock()">
+            Odblokuj za <span id="btn-cost">0</span> IP
+          </button>
+        </div>
+      </div>
+
+      <button class="modal-close" onclick="closeUnlockModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+
+    </div>
+  </div>
+
   <script>
     const API_URL = 'https://empirebackend-production.up.railway.app';
 
@@ -496,7 +659,7 @@
         return;
       }
       container.innerHTML = buildings.map(b => `
-        <div class="building-card ${b.unlocked ? 'unlocked' : 'locked'}" data-cat="${b.category}" onclick="handleBuildingClick(${b.id}, ${b.unlocked}, ${b.influenceCost})">
+        <div class="building-card ${b.unlocked ? 'unlocked' : 'locked'}" data-cat="${b.category}" onclick="handleBuildingClick(${b.id}, ${b.unlocked})">
           ${b.unlocked ? `<span class="building-lv">Lv${b.level}</span>` : `<span class="building-lock">🔒</span>`}
           <span class="building-emoji">${b.icon}</span>
           <div class="building-name">${b.name}</div>
@@ -508,21 +671,111 @@
     }
 
     let buildingsCache = null;
+    let currentEmpireIP = 0;
+    let currentBuildingToUnlock = null;
 
-    async function handleBuildingClick(id, unlocked, cost) {
-      if (unlocked) return;
-      if (cost === 0) { alert('Dokończ wymagane materiały aby odblokować ten budynek!'); return; }
-      if (!confirm(`Odblokować za ${cost} Influence Points?`)) return;
+    const BUILDING_BENEFITS = {
+      content:    ['Tworzenie contentu na skalę', 'Boost zasięgu organicznego', 'Nowe osiągnięcia content'],
+      marketing:  ['Zarządzanie kampaniami reklamowymi', 'Optymalizacja ROI', 'Nowe osiągnięcia marketing'],
+      analytics:  ['Analiza danych i metryk', 'Śledzenie konwersji', 'Nowe osiągnięcia analytics'],
+      automation: ['Automatyzacja procesów', 'Integracje z narzędziami', 'Nowe osiągnięcia automation']
+    };
+
+    function showUnlockModal(building, userIP) {
+      currentBuildingToUnlock = building;
+
+      document.getElementById('modal-building-icon').textContent = building.icon || '🏛️';
+      document.getElementById('modal-building-name').textContent = building.name;
+      document.getElementById('modal-building-category').textContent =
+        building.category.charAt(0).toUpperCase() + building.category.slice(1) + ' • ' + building.description;
+
+      const benefits = BUILDING_BENEFITS[building.category] || ['Dostęp do unikalnych funkcji'];
+      document.getElementById('modal-benefits-list').innerHTML =
+        benefits.map(b => `<li>${b}</li>`).join('');
+
+      document.getElementById('modal-cost-amount').textContent = building.influenceCost;
+      document.getElementById('btn-cost').textContent = building.influenceCost;
+      document.getElementById('modal-current-ip').textContent = userIP;
+      document.getElementById('modal-remaining-ip').textContent = userIP - building.influenceCost;
+
+      const btn = document.getElementById('btn-confirm');
+      if (userIP < building.influenceCost) {
+        btn.classList.add('insufficient');
+        btn.textContent = 'Niewystarczająco IP';
+        btn.disabled = true;
+      } else {
+        btn.classList.remove('insufficient');
+        btn.innerHTML = `Odblokuj za <span id="btn-cost">${building.influenceCost}</span> IP`;
+        btn.disabled = false;
+      }
+
+      document.getElementById('unlock-modal').style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeUnlockModal() {
+      document.getElementById('unlock-modal').style.display = 'none';
+      document.body.style.overflow = '';
+      currentBuildingToUnlock = null;
+    }
+
+    async function confirmUnlock() {
+      if (!currentBuildingToUnlock) return;
+      const btn = document.getElementById('btn-confirm');
+      if (btn.disabled) return;
+
+      btn.disabled = true;
+      btn.textContent = 'Odblokowywanie...';
+
       try {
         const res = await apiFetch('/api/empire/unlock-building', {
-          method: 'POST', body: JSON.stringify({ buildingId: id })
+          method: 'POST', body: JSON.stringify({ buildingId: currentBuildingToUnlock.id })
         });
-        alert(`✅ ${res.building.name} odblokowany! +${res.experienceGained} XP`);
-        loadEmpirePage();
+        showSuccessNotification(`${currentBuildingToUnlock.name} odblokowany! +${res.experienceGained} XP`);
+        closeUnlockModal();
+        await loadEmpirePage();
       } catch (e) {
-        alert('Błąd: ' + (e.message || 'Nie można odblokować'));
+        showSuccessNotification(e.message || 'Nie można odblokować', true);
+        btn.disabled = false;
+        btn.innerHTML = `Odblokuj za <span id="btn-cost">${currentBuildingToUnlock.influenceCost}</span> IP`;
       }
     }
+
+    function showSuccessNotification(message, isError = false) {
+      const el = document.createElement('div');
+      el.style.cssText = `
+        position: fixed; top: 20px; right: 20px; z-index: 10000;
+        background: ${isError ? 'linear-gradient(135deg,#ef4444,#dc2626)' : 'linear-gradient(135deg,#10b981,#059669)'};
+        color: #fff; padding: 14px 22px; border-radius: 12px;
+        font-size: 14px; font-weight: 500; font-family: 'DM Sans', sans-serif;
+        box-shadow: 0 8px 24px rgba(${isError ? '239,68,68' : '16,185,129'},0.35);
+        animation: slideInRight 0.3s ease;
+      `;
+      el.textContent = (isError ? '✗ ' : '✓ ') + message;
+      document.body.appendChild(el);
+      setTimeout(() => {
+        el.style.animation = 'slideOutRight 0.3s ease forwards';
+        setTimeout(() => el.remove(), 320);
+      }, 3000);
+    }
+
+    function handleBuildingClick(id, unlocked) {
+      if (unlocked) return;
+      const building = buildingsCache?.buildings.find(b => b.id === id);
+      if (!building) return;
+      if (building.influenceCost === 0) {
+        showSuccessNotification('Dokończ wymagane materiały aby odblokować ten budynek!', true);
+        return;
+      }
+      showUnlockModal(building, currentEmpireIP);
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeUnlockModal();
+    });
+    document.getElementById('unlock-modal').addEventListener('click', e => {
+      if (e.target.id === 'unlock-modal') closeUnlockModal();
+    });
 
     function renderAchievements(data, filterRarity = 'all') {
       const container = document.getElementById('achievements-container');
@@ -575,6 +828,7 @@
         ]);
         buildingsCache = buildings;
         achData = achievements;
+        currentEmpireIP = overview.empire.influencePoints;
         renderOverview(overview);
         renderBuildings(buildings);
         renderAchievements(achievements);
